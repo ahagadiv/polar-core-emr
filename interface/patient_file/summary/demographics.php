@@ -1663,6 +1663,26 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         echo $twig->getTwig()->render('patient/card/loader.html.twig', $viewArgs);
                     } // end if crw
 
+                    // Show POLAR Vascular Access Clinical Reminders
+                    require_once("$srcdir/vascular_access_rules.php");
+                    $id = "vascular_access_reminders_ps_expand";
+                    $dispatchResult = $ed->dispatch(new CardRenderEvent('vascular_access_reminders'), CardRenderEvent::EVENT_HANDLE);
+                    // Force refresh of vascular access reminders
+                    $vascular_reminders = get_vascular_access_reminders($pid);
+                    $viewArgs = [
+                        'title' => xl("🏥 POLAR Vascular Access Safety Checklist"),
+                        'id' => $id,
+                        'initiallyCollapsed' => (getUserSetting($id) == 0) ? true : false,
+                        'btnLabel' => "Mark Off Checklist",
+                        'btnLink' => "../reminder/vascular_access_reminders.php?patient_id=" . attr_url($pid),
+                        'linkMethod' => "html",
+                        'auth' => AclMain::aclCheckCore('patients', 'alert', '', 'write'),
+                        'prependedInjection' => $dispatchResult->getPrependedInjection(),
+                        'appendedInjection' => $dispatchResult->getAppendedInjection(),
+                        'vascular_reminders' => $vascular_reminders,
+                    ];
+                    echo $twig->getTwig()->render('patient/card/vascular_access_reminders.html.twig', $viewArgs);
+
                     $displayAppts = false;
                     $displayRecurrAppts = false;
                     $displayPastAppts = false;
