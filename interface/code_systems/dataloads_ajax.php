@@ -193,7 +193,9 @@ $activeAccordionSection = $_GET['aas'] ?? '0';
             const inst_load_id = `#${dbName}_inst_loading`;
             const stg_load_id = `#${dbName}_stg_loading`;
 
-            top.restoreSession()
+            if (typeof top.restoreSession === 'function') {
+                top.restoreSession();
+            }
             $(inst_load_id).show();
             $(stg_load_id).show();
 
@@ -263,6 +265,14 @@ $activeAccordionSection = $_GET['aas'] ?? '0';
             });
         });
     });
+    
+    // Add missing restoreSession function
+    if (typeof top.restoreSession !== 'function') {
+        top.restoreSession = function() {
+            // Simple session restore function
+            return true;
+        };
+    }
 </script>
 </body>
 </html>

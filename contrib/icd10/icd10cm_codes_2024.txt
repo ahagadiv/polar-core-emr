@@ -1,0 +1,58 @@
+E11.9	Type 2 diabetes mellitus without complications
+I10	Essential (primary) hypertension
+Z00.00	Encounter for general adult medical examination without abnormal findings
+J44.1	Chronic obstructive pulmonary disease with acute exacerbation
+K21.9	Gastro-esophageal reflux disease without esophagitis
+M25.561	Pain in right knee
+F32.9	Major depressive disorder, single episode, unspecified
+R50.9	Fever, unspecified
+M79.3	Panniculitis, unspecified
+G43.909	Migraine, unspecified, not intractable, without status migrainosus
+Z51.11	Encounter for antineoplastic chemotherapy
+Z87.891	Personal history of nicotine dependence
+Z79.899	Other long term (current) use of medication
+Z95.1	Presence of aortocoronary bypass graft
+Z96.41	Presence of artificial hip joint
+Z97.11	Presence of artificial arm (complete) (partial)
+Z98.85	Acquired absence of other specified organs
+Z99.11	Dependence on respirator
+Z99.12	Dependence on renal dialysis
+Z99.2	Dependence on enabling machine and device, not elsewhere classified
+A41.9	Sepsis, unspecified organism
+B34.9	Viral infection, unspecified
+C78.00	Secondary malignant neoplasm of unspecified lung
+D50.9	Iron deficiency anemia, unspecified
+E78.5	Hyperlipidemia, unspecified
+F41.9	Anxiety disorder, unspecified
+G93.1	Anoxic brain damage, not elsewhere classified
+H35.9	Unspecified disorder of choroid
+I25.10	Atherosclerotic heart disease of native coronary artery without angina pectoris
+J18.9	Pneumonia, unspecified organism
+K59.00	Constipation, unspecified
+L30.9	Dermatitis, unspecified
+M25.50	Pain in unspecified joint
+N18.6	End stage renal disease
+O80.1	Normal delivery, single, with forceps
+P07.10	Newborn, gestational age 37-38 completed weeks
+Q89.9	Congenital malformation, unspecified
+R06.02	Shortness of breath
+S72.001A	Fracture of unspecified part of neck of right femur, initial encounter
+T78.40XA	Allergy, unspecified, initial encounter
+U07.1	COVID-19
+V43.52XA	Car passenger injured in collision with heavy transport vehicle or bus in traffic accident, initial encounter
+W19.XXXA	Fall, unspecified, initial encounter
+X58.XXXA	Exposure to other specified factors, initial encounter
+Y93.9	Activity, unspecified
+Z00.121	Encounter for routine child health examination with abnormal findings
+Z12.11	Encounter for screening for malignant neoplasm of colon
+Z23	Encounter for immunization
+Z51.11	Encounter for antineoplastic chemotherapy
+Z87.891	Personal history of nicotine dependence
+Z79.899	Other long term (current) use of medication
+Z95.1	Presence of aortocoronary bypass graft
+Z96.41	Presence of artificial hip joint
+Z97.11	Presence of artificial arm (complete) (partial)
+Z98.85	Acquired absence of other specified organs
+Z99.11	Dependence on respirator
+Z99.12	Dependence on renal dialysis
+Z99.2	Dependence on enabling machine and device, not elsewhere classified

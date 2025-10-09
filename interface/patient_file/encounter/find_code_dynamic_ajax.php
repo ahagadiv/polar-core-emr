@@ -29,14 +29,18 @@ if ($iDisplayStart >= 0 && $iDisplayLength >= 0) {
 }
 $searchTerm = $_GET['sSearch'] ?? '';
 
+// Initialize variables to prevent undefined warnings
+$iTotal = 0;
+$iFilteredTotal = 0;
+
 // What we are picking from: codes, fields, lists or groups
-$what = $_GET['what'];
+$what = $_GET['what'] ?? '';
 $layout_id = '';
 
 if ($what == 'codes') {
-    $codetype = $_GET['codetype'];
+    $codetype = $_GET['codetype'] ?? '';
     $prod = $codetype == 'PROD';
-    $ncodetype = $code_types[$codetype]['id'];
+    $ncodetype = $code_types[$codetype]['id'] ?? 0;
     $include_inactive = !empty($_GET['inactive']);
 } elseif ($what == 'fields') {
     $source = empty($_GET['source']) ? 'D' : $_GET['source'];
@@ -158,10 +162,10 @@ $ordermode = null;
 $fe_column = 0;
 $fe_reverse = false;
 if (isset($_GET['iSortCol_0'])) {
-    for ($i = 0; $i < intval($_GET['iSortingCols']); ++$i) {
-        $iSortCol = intval($_GET["iSortCol_$i"]);
-        if ($_GET["bSortable_$iSortCol"] == "true") {
-            $sSortDir = escape_sort_order($_GET["sSortDir_$i"]); // ASC or DESC
+    for ($i = 0; $i < intval($_GET['iSortingCols'] ?? 0); ++$i) {
+        $iSortCol = intval($_GET["iSortCol_$i"] ?? 0);
+        if (($_GET["bSortable_$iSortCol"] ?? '') == "true") {
+            $sSortDir = escape_sort_order($_GET["sSortDir_$i"] ?? 'ASC'); // ASC or DESC
       // We are to sort on column # $iSortCol in direction $sSortDir.
             $orderby .= $orderby ? ', ' : 'ORDER BY ';
 
@@ -280,7 +284,7 @@ if ($what == 'fields' && $source == 'V') {
 // Build the output data array.
 //
 $out = [
-  "sEcho"                => intval($_GET['sEcho']),
+  "sEcho"                => intval($_GET['sEcho'] ?? 0),
   "iTotalRecords"        => ($iTotal) ? $iTotal : 0,
   "iTotalHasMoreRecords" => false,
   "iSearchEmptyError"    => false,

@@ -252,9 +252,10 @@ if (
     echo "</script></body></html>\n";
     exit();
 } else {
-    $ins_co = (new InsuranceCompanyService())->getOneById($_GET['ins']) ?? null;
-    $ins_co_address = (new AddressService())->getOneByForeignId($_GET['ins']) ?? null;
-    $ins_co_phone = (new PhoneNumberService())->getOneByForeignId($_GET['ins']) ?? null;
+    $ins_id = isset($_GET['ins']) ? $_GET['ins'] : null;
+    $ins_co = $ins_id ? (new InsuranceCompanyService())->getOneById($ins_id) ?? null : null;
+    $ins_co_address = $ins_id ? (new AddressService())->getOneByForeignId($ins_id) ?? null : null;
+    $ins_co_phone = $ins_id ? (new PhoneNumberService())->getOneByForeignId($ins_id) ?? null : null;
 }
 
  // Query x12_partners.
