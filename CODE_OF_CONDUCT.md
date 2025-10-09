@@ -1,80 +1,133 @@
-# Code of Conduct
+🧊 POLARCORE™ Code of Conduct
 
-## 1. Purpose
+A Project by POLAR™ Healthcare Professional Corporation
 
-A primary goal of OpenEMR is to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. As such, we are committed to providing a friendly, safe and welcoming environment for all, regardless of gender, sexual orientation, ability, ethnicity, socioeconomic status, and religion (or lack thereof).
+1. Purpose
 
-This code of conduct outlines our expectations for all those who participate in our community, as well as the consequences for unacceptable behavior.
+The primary goal of POLARCORE™ is to build an open, ethical, and inclusive digital ecosystem for healthcare innovation.
+We are committed to fostering a professional, safe, and welcoming environment for contributors, clinicians, engineers, and partners from all backgrounds — regardless of gender, identity, orientation, ability, ethnicity, religion, or socioeconomic status.
 
-We invite all those who participate in OpenEMR to help us create safe and positive experiences for everyone.
+This Code of Conduct defines our shared expectations for all participants who engage with the POLAR™ Healthcare and POLARCORE™ communities. It reflects our corporate culture of excellence, compassion, and accountability in every aspect of innovation.
 
-## 2. Open Source Citizenship
+By contributing to POLARCORE™, you join a mission founded by Alejandro M. Hagad IV, RN, VA-BC, CCRN — a nurse-engineer who built this platform from the ground up to empower home-based clinicians with technology that serves humanity.
 
-A supplemental goal of this Code of Conduct is to increase open source citizenship by encouraging participants to recognize and strengthen the relationships between our actions and their effects on our community.
+2. Professional Citizenship
 
-Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
+POLARCORE™ is rooted in healthcare, where trust and respect are not optional — they are the standard.
+We encourage all contributors and collaborators to demonstrate leadership through:
 
-If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, we want to know.
+Empathy in communication and collaboration.
 
-## 3. Expected Behavior
+Constructive engagement that uplifts others.
 
-The following behaviors are expected and requested of all community members:
+Ethical use of information and technology.
 
-*   Participate in an authentic and active way. In doing so, you contribute to the health and longevity of this community.
-*   Exercise consideration and respect in your speech and actions.
-*   Attempt collaboration before conflict.
-*   Refrain from demeaning, discriminatory, or harassing behavior and speech.
-*   Be mindful of your surroundings and of your fellow participants. Alert community leaders if you notice a dangerous situation, someone in distress, or violations of this Code of Conduct, even if they seem inconsequential.
-*   Remember that community event venues may be shared with members of the public; please be respectful to all patrons of these locations.
+Commitment to privacy, confidentiality, and HIPAA-aligned conduct.
 
-## 4. Unacceptable Behavior
+Positive action within this community strengthens not only our project but the integrity of digital healthcare itself.
 
-The following behaviors are considered harassment and are unacceptable within our community:
+3. Expected Behavior
 
-*   Violence, threats of violence or violent language directed against another person.
-*   Sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory jokes and language.
-*   Posting or displaying sexually explicit or violent material.
-*   Posting or threatening to post other people’s personally identifying information ("doxing").
-*   Personal insults, particularly those related to gender, sexual orientation, race, religion, or disability.
-*   Inappropriate photography or recording.
-*   Inappropriate physical contact. You should have someone’s consent before touching them.
-*   Unwelcome sexual attention. This includes, sexualized comments or jokes; inappropriate touching, groping, and unwelcomed sexual advances.
-*   Deliberate intimidation, stalking or following (online or in person).
-*   Advocating for, or encouraging, any of the above behavior.
-*   Sustained disruption of community events, including talks and presentations.
+The following principles guide participation within the POLAR™ ecosystem:
 
-## 5. Consequences of Unacceptable Behavior
+Participate authentically and proactively — your voice matters.
 
-Unacceptable behavior from any community member, including sponsors and those with decision-making authority, will not be tolerated.
+Communicate with respect, clarity, and professionalism.
 
-Anyone asked to stop unacceptable behavior is expected to comply immediately.
+Collaborate before criticizing; prioritize solutions over ego.
 
-If a community member engages in unacceptable behavior, the community organizers may take any action they deem appropriate, up to and including a temporary ban or permanent expulsion from the community without warning (and without refund in the case of a paid event).
+Protect patient privacy and corporate confidentiality at all times.
 
-## 6. Reporting Guidelines
+Refrain from discriminatory, demeaning, or harassing behavior.
 
-If you are subject to or witness unacceptable behavior, or have any other concerns, please notify a community organizer as soon as possible. This can be done by sending a direct message to "admins" on the community forums found at https://community.open-emr.org/.
+Support a culture of inclusion, mentorship, and innovation.
 
+Be alert to your environment and report any concerning activity.
 
+4. Unacceptable Behavior
 
-Additionally, community organizers are available to help community members engage with local law enforcement or to otherwise help those experiencing unacceptable behavior feel safe. In the context of in-person events, organizers will also provide escorts as desired by the person experiencing distress.
+POLAR™ maintains zero tolerance for misconduct, including but not limited to:
 
-## 7. Addressing Grievances
+Violence, threats, or harassment (verbal, written, or physical).
 
-If you feel you have been falsely or unfairly accused of violating this Code of Conduct, you should notify OpenEMR with a concise description of your grievance. Your grievance will be handled in accordance with our existing governing policies.
+Discrimination or hate speech based on race, gender, identity, religion, or disability.
 
+Sexualized language, imagery, or unwelcome advances.
 
+Invasion of privacy, including sharing personal or protected information.
 
-## 8. Scope
+Cyberstalking, intimidation, or coordinated online attacks.
 
-We expect all community participants (contributors, paid or otherwise; sponsors; and other guests) to abide by this Code of Conduct in all community venues–online and in-person–as well as in all one-on-one communications pertaining to community business.
+Deliberate disruption of discussions, events, or team operations.
 
-This code of conduct and its related procedures also applies to unacceptable behavior occurring outside the scope of community activities when such behavior has the potential to adversely affect the safety and well-being of community members.
+Misuse of clinical or patient-related data.
 
-## 10. License and attribution
+Such actions will result in immediate review and potential removal from the community, project, or organization partnership.
 
-This Code of Conduct is distributed under a [Creative Commons Attribution-ShareAlike license](http://creativecommons.org/licenses/by-sa/3.0/).
+5. Consequences of Misconduct
 
-Portions of text derived from the [Django Code of Conduct](https://www.djangoproject.com/conduct/) and the [Geek Feminism Anti-Harassment Policy](http://geekfeminism.wikia.com/wiki/Conference_anti-harassment/Policy).
+Unacceptable behavior — from any member, partner, or sponsor — will be addressed promptly and decisively.
+Depending on severity, consequences may include:
 
-Retrieved on November 22, 2016 from [http://citizencodeofconduct.org/](http://citizencodeofconduct.org/)
+Formal warning and documentation.
+
+Temporary suspension from collaboration or events.
+
+Permanent removal from the POLARCORE™ community and repositories.
+
+Escalation to professional or legal authorities when applicable.
+
+POLAR™ reserves the right to protect the integrity of its brand, mission, and contributors without prior notice.
+
+6. Reporting Guidelines
+
+If you experience or witness unacceptable behavior, or have concerns regarding conduct, please reach out confidentially:
+
+📧 compliance@polarhealthcare.net
+
+📧 security@polarhealthcare.net
+ (for data or privacy-related issues)
+
+Community leaders are committed to prompt, impartial review and — where needed — coordination with appropriate authorities. Reports are treated with the highest discretion and respect.
+
+7. Grievance Resolution
+
+If you believe you have been unfairly accused of violating this Code of Conduct, please email ethics@polarhealthcare.net
+ with a concise summary of your grievance.
+Your report will be reviewed by the POLAR™ Governance Team, following internal HR and compliance procedures consistent with professional and legal standards.
+
+8. Scope
+
+This Code applies to all POLARCORE™ and POLAR™ Healthcare activities, including but not limited to:
+
+GitHub repositories and project contributions
+
+Online communications, discussions, and documentation
+
+Internal and external meetings, workshops, and events
+
+Collaborative interactions involving affiliates, contractors, and volunteers
+
+It also extends to behavior outside official activities when such conduct may adversely affect the safety, reputation, or inclusivity of the community or company.
+
+9. Commitment to Clinical Integrity
+
+As a healthcare-centered organization, we hold an additional layer of responsibility:
+All POLARCORE™ contributors and users are expected to uphold the ethical standards of patient care, accuracy in documentation, and adherence to privacy regulations as defined by HIPAA, CMS, and applicable state laws.
+
+Failure to uphold these standards may result in disciplinary action or termination of access to POLARCORE™ systems.
+
+10. License and Attribution
+
+This Code of Conduct is distributed under a Creative Commons Attribution-ShareAlike license
+.
+Portions adapted from:
+
+The Django Code of Conduct
+
+The Open Source Citizenship Framework
+
+🧊 POLARCORE™ | A POLAR™ Healthcare Professional Corporation Project
+
+“Precision. Compassion. Innovation — Delivered at the Point of Care.”
+www.polarhealthcare.net
