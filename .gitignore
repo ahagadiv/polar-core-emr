@@ -1,0 +1,29 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+
+# PHP / composer caches (if any)
+vendor/
+composer.lock
+
+# OpenEMR/runtime bits
+sites/*/documents/
+sites/*/edi/
+sites/*/letters/
+sites/*/invoice_pdf/
+sites/*/era/
+sites/*/temp/
+sites/*/gacl/
+sites/*/cache/
+interface/main/calendar/modules/PostCalendar/pntemplates/compiled/
+
+# Logs & uploads
+*.log
+*.zip
+*.tar.gz
+
+# Node/build (if you ever add frontend)
+node_modules/
+dist/
+build/

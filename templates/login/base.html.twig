@@ -1,0 +1,108 @@
+{#
+The base login Twig template
+
+This template sets up the HTML skeleton for the login page and defines several
+blocks that can be overridden by a specific layout. This template cannot be
+directly used, instead, it is extended by a layout that implements the styling
+and semantic choices
+
+@package OpenEMR
+@subpackage Login
+@author Robert Down <robertdown@live.com
+@copyright Copyright (c) 2023 Robert Down <robertdown@live.com>
+@copyright Copyright (c) 2023 Providence Healthtech
+@license https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
+#}
+{% set srOnly = (showLabels == true) ? "" : "sr-only" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% if displayGoogleSignin %}
+        {% include "login/partials/html/google_signin.html.twig" %}
+    {% endif %}
+
+    <title>{% block title %}{{ title|text }} {{ "Login"|xlt }}{% endblock %}</title>
+    {% block head %}{% endblock %}
+    {{ setupHeader() }}
+
+    {% include "login/partials/js/login_submit.js.twig" %}
+
+    {% block css %}
+    <link rel="stylesheet" href="{{ webroot }}/public/css/medical_login.css?v=20251007">
+    <style type="text/css">
+        /* POLAR Healthcare Custom Login Styling - Inline for immediate effect */
+        body {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%) !important;
+            background-attachment: fixed !important;
+            min-height: 100vh !important;
+        }
+        
+        .band {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(15px) !important;
+            border-radius: 25px !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            margin: 20px !important;
+        }
+        
+        .form-control {
+            border-radius: 12px !important;
+            border: 2px solid #e9ecef !important;
+            padding: 15px 20px !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 0.3rem rgba(102, 126, 234, 0.2) !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 15px 35px !important;
+            font-weight: 600 !important;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4) !important;
+        }
+        
+        .band,
+        .box,
+        .vertical-band {
+            background-color: var(--light);
+        }
+    </style>
+    {% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passInput = document.getElementById('clearPass');
+            const toggle = document.getElementById('password-icon');
+            toggle.addEventListener('click', function () {
+                const isPassword = passInput.getAttribute('type') === 'password';
+                passInput.setAttribute('type', isPassword ? 'text' : 'password');
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+</head>
+<body>
+
+{% block pre_content %}{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block post_content %}{% endblock %}
+
+</body>
+
+</html>
+{% if displayGoogleSignin %}
+    {# @todo Google signing should be its own module and injected in a better way #}
+    {% include "login/partials/js/google_signin.js.twig" %}
+{% endif %}
