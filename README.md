@@ -1,72 +1,157 @@
-[![Syntax Status](https://github.com/openemr/openemr/actions/workflows/syntax.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/syntax.yml)
-[![Styling Status](https://github.com/openemr/openemr/actions/workflows/styling.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/styling.yml)
-[![Testing Status](https://github.com/openemr/openemr/actions/workflows/test.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/test.yml)
-[![JS Unit Testing Status](https://github.com/openemr/openemr/actions/workflows/js-test.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/js-test.yml)
-[![PHPStan](https://github.com/openemr/openemr/actions/workflows/phpstan.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/phpstan.yml)
-[![Rector](https://github.com/openemr/openemr/actions/workflows/rector.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/rector.yml)
-[![ShellCheck](https://github.com/openemr/openemr/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/openemr/openemr/actions/workflows/shellcheck.yml)
-[![codecov](https://codecov.io/gh/openemr/openemr/graph/badge.svg?token=7Eu3U1Ozdq)](https://codecov.io/gh/openemr/openemr)
+🧊 POLARCORE™
 
-[![Backers on Open Collective](https://opencollective.com/openemr/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/openemr/sponsors/badge.svg)](#sponsors)
+Precision Point-of-Care | A POLAR™ Healthcare Innovation
 
-# OpenEMR
+POLARCORE™
+ is a next-generation open healthcare management and documentation system engineered by Alejandro M. Hagad IV, RN, VA-BC, CCRN, founder and CEO of POLAR Healthcare Professional Corporation
+.
+Built entirely from the ground up using minimal open-source foundations and maximum clinical insight, POLARCORE™ was designed for mobile, decentralized healthcare delivery — enabling clinicians to deliver high-acuity services in home, infusion, vascular access, and dialysis environments with hospital-grade precision.
 
-[OpenEMR](https://open-emr.org) is a Free and Open Source electronic health records and medical practice management application. It features fully integrated electronic health records, practice management, scheduling, electronic billing, internationalization, free support, a vibrant community, and a whole lot more. It runs on Windows, Linux, Mac OS X, and many other platforms.
+It represents the synthesis of clinical expertise and engineering discipline, transforming fragmented workflows into a unified, intelligent ecosystem built for the realities of modern home-based care.
 
-### Contributing
+🌐 Overview
 
-OpenEMR is a leader in healthcare open source software and comprises a large and diverse community of software developers, medical providers and educators with a very healthy mix of both volunteers and professionals. [Join us and learn how to start contributing today!](https://open-emr.org/wiki/index.php/FAQ#How_do_I_begin_to_volunteer_for_the_OpenEMR_project.3F)
+POLARCORE™ integrates:
 
-> Already comfortable with git? Check out [CONTRIBUTING.md](CONTRIBUTING.md) for quick setup instructions and requirements for contributing to OpenEMR by resolving a bug or adding an awesome feature 😊.
+Electronic Health Records (EHR)
 
-### Support
+Vascular Access Documentation
 
-Community and Professional support can be found [here](https://open-emr.org/wiki/index.php/OpenEMR_Support_Guide).
+Home Health & Infusion Management
 
-Extensive documentation and forums can be found on the [OpenEMR website](https://open-emr.org) that can help you to become more familiar about the project 📖.
+Scheduling & Coordination
 
-### Reporting Issues and Bugs
+Mobile Clinician Dashboards
 
-Report these on the [Issue Tracker](https://github.com/openemr/openemr/issues). If you are unsure if it is an issue/bug, then always feel free to use the [Forum](https://community.open-emr.org/) and [Chat](https://www.open-emr.org/chat/) to discuss about the issue 🪲.
+Real-Time Procedure Logging
 
-### Reporting Security Vulnerabilities
+Automated CPT/ICD Coding
 
-Check out [SECURITY.md](.github/SECURITY.md)
+Patient Billing and Reimbursement Automation
 
-### API
+Built on a secure, HIPAA-compliant infrastructure, it runs seamlessly on Ubuntu Linux, PHP 8.3+, and DigitalOcean cloud environments, optimized for real-time collaboration and rapid deployment across home-health networks.
 
-Check out [API_README.md](API_README.md)
+🧠 Origin Story
 
-### Docker
+“POLARCORE™ was born out of necessity — not convenience.”
+— Alejandro M. Hagad IV, RN, Founder
 
-Check out [DOCKER_README.md](DOCKER_README.md)
+As a front-line vascular access nurse, Alejandro Hagad identified the gap between enterprise EMRs and the agility needed in mobile clinical practice.
+While most EMRs were bloated, subscription-bound, and restrictive, he envisioned a precision-built, clinician-led system: simple, fast, secure, and clinically intelligent.
 
-### FHIR
+Starting with nothing but an open-source Linux server and raw code, he engineered the first POLARCORE prototype to unify:
 
-Check out [FHIR_README.md](FHIR_README.md)
+Mobile Vascular Access workflows
 
-### For Developers
+Home Health Nursing operations
 
-If using OpenEMR directly from the code repository, then the following commands will build OpenEMR (Node.js version 22.* is required) :
+Home Infusion and Dialysis protocols
 
-```shell
+Durable Medical Equipment (DME) logistics
+
+Every feature was built from scratch — designed by clinicians, for clinicians — using only the essential building blocks of open-source technology and deep healthcare operations experience.
+
+🤝 Contributing
+
+POLARCORE™ is an evolving ecosystem, inviting collaboration from:
+
+Developers in health informatics, data security, and FHIR-based API design
+
+Clinicians with experience in vascular access, home infusion, or post-acute care
+
+Engineers passionate about open healthcare architecture
+
+Join our initiative
+ and be part of a mission redefining precision care at home.
+
+Already familiar with Git workflows? Check out CONTRIBUTING.md
+ for setup details and module submission guidelines.
+
+🧾 Support & Documentation
+
+Community and Professional support for POLARCORE™ are available via:
+
+📘 www.polarhealthcare.net
+
+📧 support@polarhealthcare.net
+
+🧊 Internal Knowledge Base (coming soon)
+
+Extensive documentation, setup guides, and developer forums will be available on the official POLAR Developer Portal (2026 release).
+
+🪲 Reporting Issues
+
+If you encounter any issues, report them directly through the GitHub Issue Tracker
+.
+You can also reach out through our developer forum or Slack workspace (invite link in documentation).
+
+🔒 Security & Compliance
+
+POLARCORE™ follows HIPAA-aligned development standards.
+For vulnerability disclosures, please email security@polarhealthcare.net
+ and refer to SECURITY.md
+.
+
+🔌 API & Integrations
+
+POLARCORE™ supports REST and FHIR endpoints for:
+
+Mobile clinical applications
+
+DME order tracking
+
+Laboratory data (HL7 / LabCorp integration)
+
+Billing interoperability (CMS-1500, UB-04 mapping)
+
+Documentation available in API_README.md
+
+🧱 For Developers
+
+If cloning the repository, build POLARCORE™ using:
+
 composer install --no-dev
 npm install
 npm run build
 composer dump-autoload -o
-```
-
-### Contributors
-
-This project exists thanks to all the people who have contributed. [[Contribute]](CONTRIBUTING.md).
-<a href="https://github.com/openemr/openemr/graphs/contributors"><img src="https://opencollective.com/openemr/contributors.svg?width=890" /></a>
 
 
-### Sponsors
+Node.js 22+ and PHP 8.3+ required.
 
-Thanks to our [ONC Certification Major Sponsors](https://www.open-emr.org/wiki/index.php/OpenEMR_Certification_Stage_III_Meaningful_Use#Major_sponsors)!
+👩‍⚕️ Contributors
 
+POLARCORE™ exists thanks to the vision and multidisciplinary effort of:
 
-### License
+Alejandro M. Hagad IV, RN, VA-BC, CCRN, CHN, CVRN — Founder & Principal Architect
 
-[GNU GPL](LICENSE)
+Jean Patrick “JP” Sato, RN — Clinical Systems & Alternate RN Administrator
+
+Lizbeth Espiritu — Administrative Operations & Compliance
+
+We welcome healthcare technologists and open-source contributors.
+[Contribute]
+
+💎 Sponsors & Partners
+
+Supported by:
+
+POLAR Healthcare Professional Corporation
+
+VA-BC Prep Academy
+
+Viventium HR Systems
+
+LabCorp Partner Network
+
+LegalZoom Corporate Compliance
+
+⚖️ License
+
+GNU GPLv3
+
+🚀 Vision
+
+POLARCORE™ embodies the new era of decentralized healthcare — precision, speed, and compassion delivered where it matters most:
+the patient’s bedside.
+
+From a single nurse with a laptop in Houston to a scalable national home-health infrastructure — POLARCORE™ is the pulse of the modern mobile clinician.
