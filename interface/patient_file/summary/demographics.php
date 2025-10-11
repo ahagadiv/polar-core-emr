@@ -1219,6 +1219,29 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     echo $t->render('patient/card/rx.html.twig', $viewArgs); // render core prescription card
                     echo "</div>";
                 endif;
+                
+                // POLAR Healthcare Procedures Box
+                $procedures_query = "SELECT * FROM patient_procedures WHERE patient_id = ? AND status IN ('ACTIVE', 'COMPLETED') ORDER BY procedure_date DESC LIMIT 5";
+                $procedures_result = sqlStatement($procedures_query, [$pid]);
+                $patient_procedures = [];
+                while ($procedure = sqlFetchArray($procedures_result)) {
+                    $patient_procedures[] = $procedure;
+                }
+                
+                $id = "patient_procedures_ps_expand";
+                $viewArgs = [
+                    'title' => xl("🏥 Procedures"),
+                    'id' => $id,
+                    'initiallyCollapsed' => shouldExpandByDefault($id),
+                    'btnLabel' => "Manage Procedures",
+                    'btnLink' => "../procedures/procedures_management.php?patient_id=" . attr_url($pid),
+                    'linkMethod' => "html",
+                    'auth' => true,
+                    'patient_procedures' => $patient_procedures,
+                ];
+                echo "<div class=\"$col\">";
+                echo $t->render('patient/card/patient_procedures.html.twig', $viewArgs);
+                echo "</div>";
                 ?>
             </div>
             <div class="row">
@@ -1668,8 +1691,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         // Critical clinical sections that should always be expanded for faster workflow
                         $alwaysExpand = [
                             'allergies_ps_expand',
-                            'medical_problems_ps_expand', 
+                            'medical_problems_ps_expand',
                             'medications_ps_expand',
+                            'patient_procedures_ps_expand',
                             'vitals_ps_expand',
                             'labs_ps_expand',
                             'clinical_reminders_ps_expand',

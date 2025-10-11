@@ -1,0 +1,72 @@
+{% extends "patient/card/card_base.html.twig" %}
+
+{% block content %}
+<div class="text ml-2">
+    {% if patient_procedures is defined and patient_procedures is not empty %}
+        <div class="procedures-list">
+            {% for procedure in patient_procedures %}
+                <div class="procedure-item mb-3 p-2 border rounded" style="background: #f8f9fa;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge badge-primary">{{ procedure.cpt_code }}</span>
+                            <small class="text-muted ml-2">{{ procedure.procedure_date|date('M j, Y') }}</small>
+                        </div>
+                        <span class="badge 
+                            {% if procedure.status == 'ACTIVE' %}badge-success
+                            {% elseif procedure.status == 'COMPLETED' %}badge-info
+                            {% else %}badge-secondary
+                            {% endif %}">
+                            {{ procedure.status }}
+                        </span>
+                    </div>
+                    
+                    <div class="procedure-description mb-2">
+                        <strong>{{ procedure.procedure_description }}</strong>
+                    </div>
+                    
+                    {% if procedure.orientation != 'N/A' or procedure.catheter_trim_length or procedure.comments %}
+                        <div class="procedure-details">
+                            {% if procedure.orientation != 'N/A' %}
+                                <small class="text-muted">
+                                    <strong>Orientation:</strong> {{ procedure.orientation }}
+                                </small>
+                            {% endif %}
+                            
+                            {% if procedure.catheter_trim_length %}
+                                <small class="text-muted ml-3">
+                                    <strong>Trim Length:</strong> {{ procedure.catheter_trim_length }}
+                                </small>
+                            {% endif %}
+                            
+                            {% if procedure.comments %}
+                                <div class="mt-1">
+                                    <small class="text-muted">
+                                        <strong>Comments:</strong> {{ procedure.comments }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-3">
+            <a href="{{ btnLink }}" class="btn btn-primary btn-sm" onclick="top.restoreSession()">
+                {{ btnLabel|default('Manage Procedures') }}
+            </a>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <strong>ℹ️ No procedures recorded</strong>
+            <p class="mb-0">No procedures have been documented for this patient.</p>
+        </div>
+        
+        <div class="mt-3">
+            <a href="{{ btnLink }}" class="btn btn-primary btn-sm" onclick="top.restoreSession()">
+                Add First Procedure
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
