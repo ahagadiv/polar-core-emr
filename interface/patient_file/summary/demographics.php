@@ -1447,15 +1447,18 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 // ===============================================
 
                 // ===============================================
-                // TOP ROW CARDS - CLINICALLY MOST IMPORTANT
+                // ORGANIZED 3x3 GRID LAYOUT - TABLE BASED
                 // ===============================================
-                echo "<div class=\"row\" style=\"display: flex; flex-wrap: wrap;\">";
+                echo "<table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" border=\"0\">";
+                
+                // TOP ROW
+                echo "<tr>";
                 
                 // 1. APPOINTMENTS CARD (top-left)
                 if (isset($pid) && !$GLOBALS['disable_calendar'] && AclMain::aclCheckCore('patients', 'appt')) {
                     $id = "appointments_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('appointment'), CardRenderEvent::EVENT_HANDLE);
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $twig->getTwig()->render('patient/card/appointments.html.twig', [
                         'title' => xl("Appointments"),
                         'id' => $id,
@@ -1476,7 +1479,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                     ]);
-                    echo "</div>";
+                    echo "</td>";
                 }
                 
                 // 2. PROCEDURES CARD (top-middle)
@@ -1491,7 +1494,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     
                     $id = "procedures_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('procedures'), CardRenderEvent::EVENT_HANDLE);
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $twig->getTwig()->render('patient/card/patient_procedures.html.twig', [
                         'title' => xl("Procedures"),
                         'id' => $id,
@@ -1505,7 +1508,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                     ]);
-                    echo "</div>";
+                    echo "</td>";
                 }
                 
                 // 3. RAPID RESPONSE CONTACT CARD (top-right)
@@ -1519,7 +1522,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     
                     $id = "rapid_response_contact_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('rapid_response_contact'), CardRenderEvent::EVENT_HANDLE);
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $twig->getTwig()->render('patient/card/rapid_response_contact.html.twig', [
                         'title' => xl("Rapid Response Contact"),
                         'id' => $id,
@@ -1528,15 +1531,13 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                     ]);
-                    echo "</div>";
+                    echo "</td>";
                 }
                 
-                echo "</div>"; // End top row
+                echo "</tr>"; // End top row
                 
-                // ===============================================
-                // SECOND ROW CARDS - IMPORTANT CLINICAL INFO
-                // ===============================================
-                echo "<div class=\"row\" style=\"display: flex; flex-wrap: wrap;\">";
+                // SECOND ROW
+                echo "<tr>";
                 
                 // 4. ALLERGIES CARD (second row, left)
                 if ($allergy === 1) {
@@ -1556,14 +1557,14 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'btnLabel' => 'Edit',
                         'btnLink' => "return load_location('{$GLOBALS['webroot']}/interface/patient_file/summary/stats_full.php?active=all&category=allergy')"
                     ];
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $t->render('patient/card/allergies.html.twig', $viewArgs);
-                    echo "</div>";
+                    echo "</td>";
                 }
 
                 $patIssueService = new PatientIssuesService();
 
-                // MEDICAL PROBLEMS CARD
+                // 5. MEDICAL PROBLEMS CARD (second row, middle)
                 if ($pl === 1) {
                     $_rawPL = $patIssueService->search(['lists.pid' => $pid, 'lists.type' => 'medical_problem'])->getData();
                     $id = 'medical_problem_ps_expand';
@@ -1580,12 +1581,12 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'btnLabel' => 'Edit',
                         'btnLink' => "return load_location('{$GLOBALS['webroot']}/interface/patient_file/summary/stats_full.php?active=all&category=medical_problem')"
                     ];
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $t->render('patient/card/medical_problems.html.twig', $viewArgs);
-                    echo "</div>";
+                    echo "</td>";
                 }
 
-                // MEDICATION CARD
+                // 6. MEDICATION CARD (second row, right)
                 if ($meds === 1) {
                     $_rawMedList = $patIssueService->search(['lists.pid' => $pid, 'lists.type' => 'medication'])->getData();
                     $id = 'medication_ps_expand';
@@ -1602,19 +1603,17 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'btnLabel' => 'Edit',
                         'btnLink' => "return load_location('{$GLOBALS['webroot']}/interface/patient_file/summary/stats_full.php?active=all&category=medication')"
                     ];
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $t->render('patient/card/medication.html.twig', $viewArgs);
-                    echo "</div>";
+                    echo "</td>";
                 }
 
-                echo "</div>"; // End second row
+                echo "</tr>"; // End second row
                 
-                // ===============================================
-                // THIRD ROW CARDS - ADDITIONAL INFO
-                // ===============================================
-                echo "<div class=\"row\" style=\"display: flex; flex-wrap: wrap;\">";
+                // THIRD ROW
+                echo "<tr>";
                 
-                // PRESCRIPTIONS CARD (third row, left)
+                // 7. PRESCRIPTIONS CARD (third row, left)
                 
                 // POLAR Healthcare Procedures Box - MOVED TO TOP ROW
                 
@@ -1679,12 +1678,12 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     $viewArgs['content'] = ob_get_contents();
                     ob_end_clean();
 
-                    echo "<div class='col-md-4 p-1' style='flex: 0 0 33.333%; max-width: 33.333%;'>";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $t->render('patient/card/rx.html.twig', $viewArgs); // render core prescription card
-                    echo "</div>";
+                    echo "</td>";
                 endif;
                 
-                // RECALL CARD (moved here for proper layout)
+                // 8. RECALL CARD (third row, middle)
                 if ($resNotNull) {
                     // Show Recall if one exists
                     $query = sqlStatement("SELECT * FROM `medex_recalls` WHERE `r_pid` = ?", [(int)$pid]);
@@ -1699,7 +1698,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     }
                     $id = "recall_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('recall'), CardRenderEvent::EVENT_HANDLE);
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $twig->getTwig()->render('patient/card/recall.html.twig', [
                         'title' => xl('Recall'),
                     'id' => $id,
@@ -1709,33 +1708,34 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                     ]);
-                    echo "</div>";
+                    echo "</td>";
                 }
                 
-                // POLAR VASCULAR ACCESS SAFETY CHECKLIST (third row, right)
+                // 9. POLAR VASCULAR ACCESS SAFETY CHECKLIST (third row, right)
                 if (AclMain::aclCheckCore('patients', 'alert', '', 'readonly') || AclMain::aclCheckCore('patients', 'alert', '', 'write')) {
                     $id = "vascular_access_reminders_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('vascular_access_reminders'), CardRenderEvent::EVENT_HANDLE);
                     // Force refresh of vascular access reminders
                     $vascular_reminders = get_vascular_access_reminders($pid);
-                    $viewArgs = [
+                $viewArgs = [
                         'title' => xl("🏥 POLAR Vascular Access Safety Checklist"),
-                        'id' => $id,
+                    'id' => $id,
                         'initiallyCollapsed' => false, // Always expanded by default for faster clinical workflow
                         'btnLabel' => "Mark Off Checklist",
                         'btnLink' => "../reminder/vascular_access_reminders.php?patient_id=" . attr_url($pid),
-                        'linkMethod' => "html",
+                    'linkMethod' => "html",
                         'auth' => AclMain::aclCheckCore('patients', 'alert', '', 'write'),
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                         'vascular_reminders' => $vascular_reminders,
                     ];
-                    echo "<div class=\"col-md-4 p-1\" style=\"flex: 0 0 33.333%; max-width: 33.333%;\">";
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $twig->getTwig()->render('patient/card/vascular_access_reminders.html.twig', $viewArgs);
-                    echo "</div>";
+                    echo "</td>";
                 }
                 
-                echo "</div>"; // End third row
+                echo "</tr>"; // End third row
+                echo "</table>"; // End table
                 
                 ?>
             </div>
