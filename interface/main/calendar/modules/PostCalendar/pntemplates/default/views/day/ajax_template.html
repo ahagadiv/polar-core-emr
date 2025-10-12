@@ -605,6 +605,24 @@ foreach ($providers as $provider) {
             }
             // eventViewClass allows the event class to override the template (such as from a dispatched system event).
             $evtClass = $event['eventViewClass'] ?? $evtClass;
+            
+            // Add category label for POLAR Healthcare
+            $categoryLabel = "";
+            if ($catname && $catname != "General") {
+                $categoryLabel = " - " . $catname;
+            }
+            
+            // Check for POLAR STAT status for blinking
+            $isStatAppointment = false;
+            if ($event['apptstatus'] == 'STAT') {
+                $isStatAppointment = true;
+                $categoryLabel = " - POLAR STAT";
+            }
+            
+            // Add POLAR STAT blinking class for urgent appointments
+            if ($isStatAppointment) {
+                $evtClass .= ' polar-stat-appointment';
+            }
 
                     // if this is an IN or OUT event then we have some extra special
             // processing to be done
@@ -771,6 +789,10 @@ foreach ($providers as $provider) {
                             }
                             $content .= ")";
                         }
+                    }
+                    // Add category label for POLAR Healthcare
+                    if (isset($categoryLabel)) {
+                        $content .= $categoryLabel;
                     }
                     if ($catid == 1) $content .= "</s>";
                     $content .= "</a>";
