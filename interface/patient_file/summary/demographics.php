@@ -1,5 +1,10 @@
 <?php
 
+// Debug: Check if demographics.php is being called
+if ($_POST && isset($_POST['action'])) {
+    error_log("Demographics.php called with action: " . $_POST['action']);
+}
+
 /**
  *
  * Patient summary screen.
@@ -71,6 +76,131 @@ if (!isset($pid)) {
 // Reset the previous name flag to allow normal operation.
 // This is set in new.php so we can prevent new previous name from being added i.e no pid available.
 OpenEMR\Common\Session\SessionUtil::setSession('disablePreviousNameAdds', 0);
+
+// Handle Rapid Response Contact AJAX requests BEFORE any output is sent
+if ($_POST && isset($_POST['action']) && $_POST['action'] === 'save_rapid_response_contact') {
+    // Debug logging
+    error_log("Rapid Response Contact save request received (early)");
+    error_log("POST data: " . print_r($_POST, true));
+    
+    // Always return JSON for this action, regardless of AJAX detection
+    header('Content-Type: application/json');
+    
+    // Verify CSRF token
+    if (!CsrfUtils::verifyCsrfToken($_POST['csrf_token_form'] ?? '')) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+        exit;
+    }
+    
+    $category = $_POST['category'] ?? '';
+    $address = $_POST['address'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+    $notes = $_POST['notes'] ?? '';
+    $contactId = $_POST['contact_id'] ?? '';
+    
+                    if (!empty($category) && !empty($address)) {
+                        try {
+                            if (!empty($contactId)) {
+                                // Update existing contact
+                                $sql = "UPDATE rapid_response_contacts SET category = ?, address = ?, phone = ?, notes = ?, updated_date = NOW() WHERE id = ? AND pid = ?";
+                                $updateResult = sqlStatement($sql, [$category, $address, $phone, $notes, $contactId, $pid]);
+                            } else {
+                                // Insert new contact
+                                $sql = "INSERT INTO rapid_response_contacts (pid, category, address, phone, notes) VALUES (?, ?, ?, ?, ?)";
+                                $insertResult = sqlStatement($sql, [$pid, $category, $address, $phone, $notes]);
+                            }
+                            
+                            // Check if operation was successful (either update or insert)
+                            $operationSuccess = (!empty($contactId) && $updateResult !== false) || (empty($contactId) && $insertResult !== false);
+                            
+                            if ($operationSuccess) {
+                                // Return success response
+                                echo json_encode(['success' => true, 'message' => 'Contact saved successfully']);
+                                exit;
+                            } else {
+                                throw new Exception('Database operation failed');
+                            }
+                        } catch (Exception $e) {
+                            error_log("Rapid Response Contact save error: " . $e->getMessage());
+                            http_response_code(500);
+                            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+                            exit;
+                        }
+    } else {
+        error_log("Rapid Response Contact validation failed - category: '$category', address: '$address'");
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Category and address are required']);
+        exit;
+    }
+}
+
+// Handle delete rapid response contact
+if ($_POST && isset($_POST['action']) && $_POST['action'] === 'delete_rapid_response_contact') {
+    header('Content-Type: application/json');
+    
+    // Verify CSRF token
+    if (!CsrfUtils::verifyCsrfToken($_POST['csrf_token_form'] ?? '')) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+        exit;
+    }
+    
+    try {
+        $contactId = $_POST['contact_id'] ?? '';
+        
+        if (!empty($contactId)) {
+            // Delete specific contact
+            $sql = "DELETE FROM rapid_response_contacts WHERE id = ? AND pid = ?";
+            $deleteResult = sqlStatement($sql, [$contactId, $pid]);
+        } else {
+            // Delete all contacts for this patient (fallback)
+            $sql = "DELETE FROM rapid_response_contacts WHERE pid = ?";
+            $deleteResult = sqlStatement($sql, [$pid]);
+        }
+        
+        if ($deleteResult !== false) {
+            echo json_encode(['success' => true, 'message' => 'Contact deleted successfully']);
+            exit;
+        } else {
+            throw new Exception('Database delete failed');
+        }
+    } catch (Exception $e) {
+        error_log("Rapid Response Contact delete error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+        exit;
+    }
+}
+
+// Handle GET request for contact data
+if (isset($_GET['action']) && $_GET['action'] === 'get_rapid_response_contact') {
+    header('Content-Type: application/json');
+    
+    $contactId = $_GET['contact_id'] ?? '';
+    error_log("GET request for contact ID: $contactId, PID: $pid");
+    
+    $sql = "SELECT * FROM rapid_response_contacts WHERE id = ? AND pid = ?";
+    $contactQuery = sqlQuery($sql, [$contactId, $pid]);
+    
+    if ($contactQuery) {
+        $contactData = [
+            'id' => $contactQuery['id'],
+            'category' => $contactQuery['category'],
+            'address' => $contactQuery['address'],
+            'phone' => $contactQuery['phone'] ?? '',
+            'notes' => $contactQuery['notes'] ?? '',
+            'updated_date' => $contactQuery['updated_date']
+        ];
+        
+        error_log("Contact data found: " . json_encode($contactData));
+        echo json_encode(['success' => true, 'data' => $contactData]);
+    } else {
+        error_log("Contact not found for ID: $contactId, PID: $pid");
+        echo json_encode(['success' => false, 'error' => 'Contact not found']);
+    }
+    exit;
+}
 
 $twig = new TwigContainer(null, $GLOBALS['kernel']);
 
@@ -1242,6 +1372,47 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 echo "<div class=\"$col\">";
                 echo $t->render('patient/card/patient_procedures.html.twig', $viewArgs);
                 echo "</div>";
+                
+                // POLAR Healthcare Rapid Response Contact Info Card
+                $patientData = getPatientData($pid);
+                
+                // Handle quick contact form submission
+                // Rapid Response Contact AJAX handling moved to early in the file to avoid header issues
+                
+                // GET request handling moved to early in the file to avoid header issues
+                
+                // Prepare rapid response contacts data for template
+                $rapidResponseContacts = [];
+                $sql = "SELECT * FROM rapid_response_contacts WHERE pid = ? ORDER BY updated_date DESC";
+                $contactsQuery = sqlStatement($sql, [$pid]);
+                
+                while ($row = sqlFetchArray($contactsQuery)) {
+                    $rapidResponseContacts[] = [
+                        'id' => $row['id'],
+                        'category' => $row['category'],
+                        'address' => $row['address'],
+                        'phone' => $row['phone'] ?? '',
+                        'notes' => $row['notes'] ?? '',
+                        'updated_date' => $row['updated_date']
+                    ];
+                }
+                
+                $id = "rapid_response_contact_ps_expand";
+                $viewArgs = [
+                    'title' => xl("🚑 Rapid Response Contact"),
+                    'id' => $id,
+                    'initiallyCollapsed' => shouldExpandByDefault($id),
+                    'btnLabel' => "Edit Contact",
+                    'btnLink' => $GLOBALS['webroot'] . "/interface/patient_file/summary/demographics.php?pid=" . attr_url($pid),
+                    'linkMethod' => "html",
+                    'auth' => true,
+                    'patient_data' => $patientData,
+                    'rapid_response_contacts' => $rapidResponseContacts,
+                    'csrf_token' => CsrfUtils::collectCsrfToken(),
+                ];
+                echo "<div class=\"$col\">";
+                echo $t->render('patient/card/rapid_response_contact.html.twig', $viewArgs);
+                echo "</div>";
                 ?>
             </div>
             <div class="row">
@@ -1694,6 +1865,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                             'medical_problems_ps_expand',
                             'medications_ps_expand',
                             'patient_procedures_ps_expand',
+                            'rapid_response_contact_ps_expand',
                             'vitals_ps_expand',
                             'labs_ps_expand',
                             'clinical_reminders_ps_expand',

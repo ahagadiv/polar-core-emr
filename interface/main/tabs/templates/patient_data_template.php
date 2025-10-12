@@ -109,6 +109,8 @@ switch ($search_any_type) {
                 <div class="mt-2">
                     <span data-bind="text:patient().str_dob()"></span>
                 </div>
+                
+                
                 <!-- /ko -->
             </div>
         </div>
