@@ -1217,6 +1217,286 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     return array_filter($i, fn($_i): bool => ($_i['outcome'] != 1) && (empty($_i['enddate']) || (strtotime($_i['enddate']) > strtotime('now'))));
                 }
 
+                // ===============================================
+                // APPOINTMENT LOGIC MOVED TO TOP FOR CARD REORDERING
+                // ===============================================
+                $displayAppts = false;
+                $displayRecurrAppts = false;
+                $displayPastAppts = false;
+
+                // Show current and upcoming appointments.
+                // Recurring appointment support and Appointment Display Sets
+                // added to Appointments by Ian Jardine ( epsdky ).
+                if (isset($pid) && !$GLOBALS['disable_calendar'] && AclMain::aclCheckCore('patients', 'appt')) {
+                    $displayAppts = true;
+                    $current_date2 = date('Y-m-d');
+                    $events = [];
+                    $apptNum = (int)$GLOBALS['number_of_appts_to_show'];
+                    $apptNum2 = ($apptNum != 0) ? abs($apptNum) : 10;
+
+                    $mode1 = !$GLOBALS['appt_display_sets_option'];
+                    $colorSet1 = $GLOBALS['appt_display_sets_color_1'];
+                    $colorSet2 = $GLOBALS['appt_display_sets_color_2'];
+                    $colorSet3 = $GLOBALS['appt_display_sets_color_3'];
+                    $colorSet4 = $GLOBALS['appt_display_sets_color_4'];
+                    $extraAppts = ($mode1) ? 1 : 6;
+                    $extraApptDate = '';
+
+                    $past_appts = [];
+                    $recallArr = [];
+
+                    $events = fetchNextXAppts($current_date2, $pid, $apptNum2 + $extraAppts, true);
+
+                    if ($events) {
+                        $selectNum = 0;
+                        $apptNumber = count($events);
+                        //
+                        if ($apptNumber <= $apptNum2) {
+                            $extraApptDate = '';
+                            //
+                        } elseif ($mode1 && $apptNumber == $apptNum2 + 1) {
+                            $extraApptDate = $events[$apptNumber - 1]['pc_eventDate'];
+                            array_pop($events);
+                            --$apptNumber;
+                            $selectNum = 1;
+                            //
+                        } elseif ($apptNumber == $apptNum2 + 6) {
+                            $extraApptDate = $events[$apptNumber - 1]['pc_eventDate'];
+                            array_pop($events);
+                            --$apptNumber;
+                            $selectNum = 2;
+                            //
+                        } else { // mode 2 - $apptNum2 < $apptNumber < $apptNum2 + 6
+                            $extraApptDate = '';
+                            $selectNum = 2;
+                            //
+                        }
+
+                        $limitApptIndx = $apptNum2 - 1;
+                        $limitApptDate = $events[$limitApptIndx]['pc_eventDate'] ?? '';
+
+                        switch ($selectNum) {
+                            case 2:
+                                $lastApptIndx = $apptNumber - 1;
+                                $thisNumber = $lastApptIndx - $limitApptIndx;
+                                for ($i = 1; $i <= $thisNumber; ++$i) {
+                                    if ($events[$limitApptIndx + $i]['pc_eventDate'] != $limitApptDate) {
+                                        $extraApptDate = $events[$limitApptIndx + $i]['pc_eventDate'];
+                                        $events = array_slice($events, 0, $limitApptIndx + $i);
+                                        break;
+                                    }
+                                }
+                            // Break in the loop to improve performance
+                            case 1:
+                                $firstApptIndx = 0;
+                                for ($i = 1; $i <= $limitApptIndx; ++$i) {
+                                    if ($events[$limitApptIndx - $i]['pc_eventDate'] != $limitApptDate) {
+                                        $firstApptIndx = $apptNum2 - $i;
+                                        break;
+                                    }
+                                }
+                            // Break in the loop to improve performance
+                        }
+
+                        if ($extraApptDate) {
+                            if ($extraApptDate != $limitApptDate) {
+                                $apptStyle2 = " style='background-color:" . attr($colorSet3) . ";'";
+                            } else {
+                                $apptStyle2 = " style='background-color:" . attr($colorSet4) . ";'";
+                            }
+                        }
+                    }
+
+                    $count = 0;
+                    $toggleSet = true;
+                    $priorDate = "";
+                    $therapyGroupCategories = [];
+                    $query = sqlStatement("SELECT pc_catid FROM openemr_postcalendar_categories WHERE pc_cattype = 3 AND pc_active = 1");
+                    while ($result = sqlFetchArray($query)) {
+                        $therapyGroupCategories[] = $result['pc_catid'];
+                    }
+
+                    // Build the UI Loop
+                    $appts = [];
+                    foreach ($events as $row) {
+                        $count++;
+                        $dayname = date("D", strtotime($row['pc_eventDate']));
+                        $displayMeridiem = ($GLOBALS['time_display_format'] == 0) ? "" : "am";
+                        $disphour = substr($row['pc_startTime'], 0, 2) + 0;
+                        $dispmin = substr($row['pc_startTime'], 3, 2);
+                        if ($disphour >= 12 && $GLOBALS['time_display_format'] == 1) {
+                            $displayMeridiem = "pm";
+                            if ($disphour > 12) {
+                                $disphour -= 12;
+                            }
+                        }
+
+                        // Note the translaution occurs here instead of in teh Twig file for some specific concatenation needs
+                        $etitle = xl('(Click to edit)');
+                        if ($row['pc_hometext'] != "") {
+                            $etitle = xl('Comments') . ": " . ($row['pc_hometext']) . "\r\n" . $etitle;
+                        }
+
+                        $row['etitle'] = $etitle;
+
+                        if ($extraApptDate && $count > $firstApptIndx) {
+                            $apptStyle = $apptStyle2;
+                        } else {
+                            if ($row['pc_eventDate'] != $priorDate) {
+                                $priorDate = $row['pc_eventDate'];
+                                $toggleSet = !$toggleSet;
+                            }
+
+                            $bgColor = ($toggleSet) ? $colorSet2 : $colorSet1;
+                        }
+
+                        $row['pc_eventTime'] = sprintf("%02d", $disphour) . ":{$dispmin}";
+                        $row['pc_status'] = generate_display_field(['data_type' => '1', 'list_id' => 'apptstat'], $row['pc_apptstatus']);
+                        if ($row['pc_status'] == 'None') {
+                            $row['pc_status'] = 'Scheduled';
+                        }
+
+                        if (in_array($row['pc_catid'], $therapyGroupCategories)) {
+                            $row['groupName'] = getGroup($row['pc_gid'])['group_name'];
+                        }
+
+                        $row['uname'] = text($row['ufname'] . " " . $row['ulname']);
+                        $row['bgColor'] = $bgColor;
+                        $row['dayName'] = $dayname;
+                        $row['displayMeridiem'] = $displayMeridiem;
+                        $row['jsEvent'] = attr_js(preg_replace("/-/", "", $row['pc_eventDate'])) . ', ' . attr_js($row['pc_eid']);
+                        $appts[] = $row;
+                    }
+
+                    if ($resNotNull) {
+                        // Show Recall if one exists
+                        $query = sqlStatement("SELECT * FROM `medex_recalls` WHERE `r_pid` = ?", [(int)$pid]);
+                        $recallArr = [];
+                        $count2 = 0;
+                        while ($result2 = sqlFetchArray($query)) {
+                            //tabYourIt('recall', 'main/messages/messages.php?go=' + choice);
+                            //parent.left_nav.loadFrame('1', tabNAME, url);
+                            $recallArr[] = [
+                                'date' => $result2['r_eventDate'],
+                                'reason' => $result2['r_reason'],
+                            ];
+                            $count2++;
+                        }
+                        $id = "recall_ps_expand";
+                        $dispatchResult = $ed->dispatch(new CardRenderEvent('recall'), CardRenderEvent::EVENT_HANDLE);
+                        echo $twig->getTwig()->render('patient/card/recall.html.twig', [
+                            'title' => xl('Recall'),
+                            'id' => $id,
+                            'initiallyCollapsed' => shouldExpandByDefault($id),
+                            'recalls' => $recallArr,
+                            'recallsAvailable' => ($count < 1 && empty($count2)) ? false : true,
+                            'prependedInjection' => $dispatchResult->getPrependedInjection(),
+                            'appendedInjection' => $dispatchResult->getAppendedInjection(),
+                        ]);
+                    }
+                } // End of Appointments Widget.
+
+                /* Widget that shows recurrences for appointments. */
+                $recurr = [];
+                if (isset($pid) && !$GLOBALS['disable_calendar'] && $GLOBALS['appt_recurrences_widget'] && AclMain::aclCheckCore('patients', 'appt')) {
+                    $displayRecurrAppts = true;
+                    $count = 0;
+                    $toggleSet = true;
+                    $priorDate = "";
+
+                    //Fetch patient's recurrences. Function returns array with recurrence appointments' category, recurrence pattern (interpreted), and end date.
+                    $recurrences = fetchRecurrences($pid);
+                    if (!empty($recurrences)) {
+                        foreach ($recurrences as $row) {
+                            if (!recurrence_is_current($row['pc_endDate'])) {
+                                continue;
+                            }
+
+                            if (ends_in_a_week($row['pc_endDate'])) {
+                                $row['close_to_end'] = true;
+                            }
+                            $recurr[] = $row;
+                        }
+                    }
+                }
+                /* End of recurrence widget */
+
+                // Show PAST appointments.
+                // added by Terry Hill to allow reverse sorting of the appointments
+                $direction = '1';
+                if ($GLOBALS['num_past_appointments_to_show'] < 0) {
+                    $direction = '2';
+                    ($showpast = -1 * $GLOBALS['num_past_appointments_to_show']);
+                } else {
+                    $showpast = $GLOBALS['num_past_appointments_to_show'];
+                }
+
+                if (isset($pid) && !$GLOBALS['disable_calendar'] && $showpast > 0 && AclMain::aclCheckCore('patients', 'appt')) {
+                    $displayPastAppts = true;
+
+                    $pastAppts = fetchXPastAppts($pid, $showpast, $direction); // This line added by epsdky
+
+                    $count = 0;
+
+                    foreach ($pastAppts as $row) {
+                        $count++;
+                        $dayname = date("D", strtotime($row['pc_eventDate']));
+                        $displayMeridiem = ($GLOBALS['time_display_format'] == 0) ? "" : "am";
+                        $disphour = substr($row['pc_startTime'], 0, 2) + 0;
+                        $dispmin = substr($row['pc_startTime'], 3, 2);
+                        if ($disphour >= 12) {
+                            $displayMeridiem = "pm";
+                            if ($disphour > 12 && $GLOBALS['time_display_format'] == 1) {
+                                $disphour -= 12;
+                            }
+                        }
+
+                        $petitle = xl('(Click to edit)');
+                        if ($row['pc_hometext'] != "") {
+                            $petitle = xl('Comments') . ": " . ($row['pc_hometext']) . "\r\n" . $petitle;
+                        }
+                        $row['etitle'] = $petitle;
+
+                        $row['pc_status'] = generate_display_field(['data_type' => '1', 'list_id' => 'apptstat'], $row['pc_apptstatus']);
+
+                        $row['dayName'] = $dayname;
+                        $row['displayMeridiem'] = $displayMeridiem;
+                        $row['pc_eventTime'] = sprintf("%02d", $disphour) . ":{$dispmin}";
+                        $row['uname'] = text($row['ufname'] . " " . $row['ulname']);
+                        $row['jsEvent'] = attr_js(preg_replace("/-/", "", $row['pc_eventDate'])) . ', ' . attr_js($row['pc_eid']);
+                        $past_appts[] = $row;
+                    }
+                }
+                // END of past appointments
+                // ===============================================
+
+                // APPOINTMENTS CARD (moved to top for clinical importance)
+                if (isset($pid) && !$GLOBALS['disable_calendar'] && AclMain::aclCheckCore('patients', 'appt')) {
+                    $id = "appointments_ps_expand";
+                    $dispatchResult = $ed->dispatch(new CardRenderEvent('appointment'), CardRenderEvent::EVENT_HANDLE);
+                    echo "<div class=\"$col\">";
+                    echo $twig->getTwig()->render('patient/card/appointments.html.twig', [
+                        'title' => xl("Appointments"),
+                        'id' => $id,
+                        'initiallyCollapsed' => shouldExpandByDefault($id),
+                        'btnLabel' => "Add",
+                        'btnLink' => "return newEvt()",
+                        'linkMethod' => "javascript",
+                        'appts' => $appts,
+                        'recurrAppts' => $recurr,
+                        'pastAppts' => $past_appts,
+                        'displayAppts' => $displayAppts,
+                        'displayRecurrAppts' => $displayRecurrAppts,
+                        'displayPastAppts' => $displayPastAppts,
+                        'extraApptDate' => $extraApptDate,
+                        'therapyGroupCategories' => $therapyGroupCategories,
+                        'auth' => $resNotNull && (AclMain::aclCheckCore('patients', 'appt', '', 'write') || AclMain::aclCheckCore('patients', 'appt', '', 'addonly')),
+                        'resNotNull' => $resNotNull,
+                        'prependedInjection' => $dispatchResult->getPrependedInjection(),
+                        'appendedInjection' => $dispatchResult->getAppendedInjection(),
+                    ]);
+                    echo "</div>";
+                }
 
                 // ALLERGY CARD
                 if ($allergy === 1) {
@@ -1287,69 +1567,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     echo "</div>";
                 }
 
-                // Render the Prescriptions card if turned on
-                if ($rx === 1) :
-                    if ($GLOBALS['erx_enable'] && ($display_current_medications_below ?? '') == 1) {
-                        $sql = "SELECT * FROM prescriptions WHERE patient_id = ? AND active = '1'";
-                        $res = sqlStatement($sql, [$pid]);
-
-                        $rxArr = [];
-                        while ($row = sqlFetchArray($res)) {
-                            $row['unit'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_units'], $row['unit']);
-                            $row['form'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_form'], $row['form']);
-                            $row['route'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_route'], $row['route']);
-                            $row['interval'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_interval'], $row['interval']);
-                            $rxArr[] = $row;
-                        }
-                        $id = "current_prescriptions_ps_expand";
-                        $viewArgs = [
-                            'title' => xl('Current Medications'),
-                            'id' => $id,
-                            'forceAlwaysOpen' => false,
-                            'initiallyCollapsed' => shouldExpandByDefault($id),
-                            'auth' => false,
-                            'rxList' => $rxArr,
-                        ];
-
-                        echo $t->render('patient/card/erx.html.twig', $viewArgs);
-                    }
-
-                    $id = "prescriptions_ps_expand";
-                    $viewArgs = [
-                        'title' => xl("Prescriptions"),
-                        'card_container_class_list' => ['flex-fill', 'mx-1', 'card'],
-                        'id' => $id,
-                        'forceAlwaysOpen' => false,
-                        'initiallyCollapsed' => shouldExpandByDefault($id),
-                        'btnLabel' => "Edit",
-                        'auth' => AclMain::aclCheckCore('patients', 'rx', '', ['write', 'addonly']),
-                    ];
-
-                    if ($GLOBALS['erx_enable']) {
-                        $viewArgs['title'] = 'Prescription History';
-                        $viewArgs['btnLabel'] = 'Add';
-                        $viewArgs['btnLink'] = "{$GLOBALS['webroot']}/interface/eRx.php?page=compose";
-                    } else {
-                        $viewArgs['btnLink'] = "editScripts('{$GLOBALS['webroot']}/controller.php?prescription&list&id=" . attr_url($pid) . "')";
-                        $viewArgs['linkMethod'] = "javascript";
-                        $viewArgs['btnClass'] = "iframe";
-                    }
-
-                    $cwd = getcwd();
-                    chdir("../../../");
-                    $c = new Controller();
-                    // This is a hacky way to get a Smarty template from the controller and injecting it into
-                    // a Twig template. This reduces the amount of refactoring that is required but ideally the
-                    // Smarty template should be upgraded to Twig
-                    ob_start();
-                    echo $c->act(['prescription' => '', 'fragment' => '', 'patient_id' => $pid]);
-                    $viewArgs['content'] = ob_get_contents();
-                    ob_end_clean();
-
-                    echo "<div class='col m-0 p-0 mx-1'>";
-                    echo $t->render('patient/card/rx.html.twig', $viewArgs); // render core prescription card
-                    echo "</div>";
-                endif;
+                // PRESCRIPTIONS CARD MOVED TO BOTTOM - will be added later
                 
                 // POLAR Healthcare Procedures Box
                 $procedures_query = "SELECT * FROM patient_procedures WHERE patient_id = ? AND status IN ('ACTIVE', 'COMPLETED') ORDER BY procedure_date DESC LIMIT 5";
@@ -1414,6 +1632,70 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 echo "<div class=\"$col\">";
                 echo $t->render('patient/card/rapid_response_contact.html.twig', $viewArgs);
                 echo "</div>";
+                
+                // PRESCRIPTIONS CARD (moved to bottom - least important for quick glance)
+                if ($rx === 1) :
+                    if ($GLOBALS['erx_enable'] && ($display_current_medications_below ?? '') == 1) {
+                        $sql = "SELECT * FROM prescriptions WHERE patient_id = ? AND active = '1'";
+                        $res = sqlStatement($sql, [$pid]);
+
+                        $rxArr = [];
+                        while ($row = sqlFetchArray($res)) {
+                            $row['unit'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_units'], $row['unit']);
+                            $row['form'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_form'], $row['form']);
+                            $row['route'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_route'], $row['route']);
+                            $row['interval'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_interval'], $row['interval']);
+                            $rxArr[] = $row;
+                        }
+                        $id = "current_prescriptions_ps_expand";
+                        $viewArgs = [
+                            'title' => xl('Current Medications'),
+                            'id' => $id,
+                            'forceAlwaysOpen' => false,
+                            'initiallyCollapsed' => shouldExpandByDefault($id),
+                            'auth' => false,
+                            'rxList' => $rxArr,
+                        ];
+
+                        echo $t->render('patient/card/erx.html.twig', $viewArgs);
+                    }
+
+                    $id = "prescriptions_ps_expand";
+                    $viewArgs = [
+                        'title' => xl("Prescriptions"),
+                        'card_container_class_list' => ['flex-fill', 'mx-1', 'card'],
+                        'id' => $id,
+                        'forceAlwaysOpen' => false,
+                        'initiallyCollapsed' => shouldExpandByDefault($id),
+                        'btnLabel' => "Edit",
+                        'auth' => AclMain::aclCheckCore('patients', 'rx', '', ['write', 'addonly']),
+                    ];
+
+                    if ($GLOBALS['erx_enable']) {
+                        $viewArgs['title'] = 'Prescription History';
+                        $viewArgs['btnLabel'] = 'Add';
+                        $viewArgs['btnLink'] = "{$GLOBALS['webroot']}/interface/eRx.php?page=compose";
+                    } else {
+                        $viewArgs['btnLink'] = "editScripts('{$GLOBALS['webroot']}/controller.php?prescription&list&id=" . attr_url($pid) . "')";
+                        $viewArgs['linkMethod'] = "javascript";
+                        $viewArgs['btnClass'] = "iframe";
+                    }
+
+                    $cwd = getcwd();
+                    chdir("../../../");
+                    $c = new Controller();
+                    // This is a hacky way to get a Smarty template from the controller and injecting it into
+                    // a Twig template. This reduces the amount of refactoring that is required but ideally the
+                    // Smarty template should be upgraded to Twig
+                    ob_start();
+                    echo $c->act(['prescription' => '', 'fragment' => '', 'patient_id' => $pid]);
+                    $viewArgs['content'] = ob_get_contents();
+                    ob_end_clean();
+
+                    echo "<div class='col m-0 p-0 mx-1'>";
+                    echo $t->render('patient/card/rx.html.twig', $viewArgs); // render core prescription card
+                    echo "</div>";
+                endif;
                 
                 ?>
             </div>
@@ -1898,278 +2180,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     ];
                     echo $twig->getTwig()->render('patient/card/vascular_access_reminders.html.twig', $viewArgs);
 
-                    $displayAppts = false;
-                    $displayRecurrAppts = false;
-                    $displayPastAppts = false;
+                    // APPOINTMENT LOGIC MOVED TO TOP - removed from here
 
-                    // Show current and upcoming appointments.
-                    // Recurring appointment support and Appointment Display Sets
-                    // added to Appointments by Ian Jardine ( epsdky ).
-                    if (isset($pid) && !$GLOBALS['disable_calendar'] && AclMain::aclCheckCore('patients', 'appt')) {
-                        $displayAppts = true;
-                        $current_date2 = date('Y-m-d');
-                        $events = [];
-                        $apptNum = (int)$GLOBALS['number_of_appts_to_show'];
-                        $apptNum2 = ($apptNum != 0) ? abs($apptNum) : 10;
-
-                        $mode1 = !$GLOBALS['appt_display_sets_option'];
-                        $colorSet1 = $GLOBALS['appt_display_sets_color_1'];
-                        $colorSet2 = $GLOBALS['appt_display_sets_color_2'];
-                        $colorSet3 = $GLOBALS['appt_display_sets_color_3'];
-                        $colorSet4 = $GLOBALS['appt_display_sets_color_4'];
-                        $extraAppts = ($mode1) ? 1 : 6;
-                        $extraApptDate = '';
-
-                        $past_appts = [];
-                        $recallArr = [];
-
-                        $events = fetchNextXAppts($current_date2, $pid, $apptNum2 + $extraAppts, true);
-
-                        if ($events) {
-                            $selectNum = 0;
-                            $apptNumber = count($events);
-                            //
-                            if ($apptNumber <= $apptNum2) {
-                                $extraApptDate = '';
-                                //
-                            } elseif ($mode1 && $apptNumber == $apptNum2 + 1) {
-                                $extraApptDate = $events[$apptNumber - 1]['pc_eventDate'];
-                                array_pop($events);
-                                --$apptNumber;
-                                $selectNum = 1;
-                                //
-                            } elseif ($apptNumber == $apptNum2 + 6) {
-                                $extraApptDate = $events[$apptNumber - 1]['pc_eventDate'];
-                                array_pop($events);
-                                --$apptNumber;
-                                $selectNum = 2;
-                                //
-                            } else { // mode 2 - $apptNum2 < $apptNumber < $apptNum2 + 6
-                                $extraApptDate = '';
-                                $selectNum = 2;
-                                //
-                            }
-
-                            $limitApptIndx = $apptNum2 - 1;
-                            $limitApptDate = $events[$limitApptIndx]['pc_eventDate'] ?? '';
-
-                            switch ($selectNum) {
-                                case 2:
-                                    $lastApptIndx = $apptNumber - 1;
-                                    $thisNumber = $lastApptIndx - $limitApptIndx;
-                                    for ($i = 1; $i <= $thisNumber; ++$i) {
-                                        if ($events[$limitApptIndx + $i]['pc_eventDate'] != $limitApptDate) {
-                                            $extraApptDate = $events[$limitApptIndx + $i]['pc_eventDate'];
-                                            $events = array_slice($events, 0, $limitApptIndx + $i);
-                                            break;
-                                        }
-                                    }
-                                // Break in the loop to improve performance
-                                case 1:
-                                    $firstApptIndx = 0;
-                                    for ($i = 1; $i <= $limitApptIndx; ++$i) {
-                                        if ($events[$limitApptIndx - $i]['pc_eventDate'] != $limitApptDate) {
-                                            $firstApptIndx = $apptNum2 - $i;
-                                            break;
-                                        }
-                                    }
-                                // Break in the loop to improve performance
-                            }
-
-                            if ($extraApptDate) {
-                                if ($extraApptDate != $limitApptDate) {
-                                    $apptStyle2 = " style='background-color:" . attr($colorSet3) . ";'";
-                                } else {
-                                    $apptStyle2 = " style='background-color:" . attr($colorSet4) . ";'";
-                                }
-                            }
-                        }
-
-                        $count = 0;
-                        $toggleSet = true;
-                        $priorDate = "";
-                        $therapyGroupCategories = [];
-                        $query = sqlStatement("SELECT pc_catid FROM openemr_postcalendar_categories WHERE pc_cattype = 3 AND pc_active = 1");
-                        while ($result = sqlFetchArray($query)) {
-                            $therapyGroupCategories[] = $result['pc_catid'];
-                        }
-
-                        // Build the UI Loop
-                        $appts = [];
-                        foreach ($events as $row) {
-                            $count++;
-                            $dayname = date("D", strtotime($row['pc_eventDate']));
-                            $displayMeridiem = ($GLOBALS['time_display_format'] == 0) ? "" : "am";
-                            $disphour = substr($row['pc_startTime'], 0, 2) + 0;
-                            $dispmin = substr($row['pc_startTime'], 3, 2);
-                            if ($disphour >= 12 && $GLOBALS['time_display_format'] == 1) {
-                                $displayMeridiem = "pm";
-                                if ($disphour > 12) {
-                                    $disphour -= 12;
-                                }
-                            }
-
-                            // Note the translaution occurs here instead of in teh Twig file for some specific concatenation needs
-                            $etitle = xl('(Click to edit)');
-                            if ($row['pc_hometext'] != "") {
-                                $etitle = xl('Comments') . ": " . ($row['pc_hometext']) . "\r\n" . $etitle;
-                            }
-
-                            $row['etitle'] = $etitle;
-
-                            if ($extraApptDate && $count > $firstApptIndx) {
-                                $apptStyle = $apptStyle2;
-                            } else {
-                                if ($row['pc_eventDate'] != $priorDate) {
-                                    $priorDate = $row['pc_eventDate'];
-                                    $toggleSet = !$toggleSet;
-                                }
-
-                                $bgColor = ($toggleSet) ? $colorSet2 : $colorSet1;
-                            }
-
-                            $row['pc_eventTime'] = sprintf("%02d", $disphour) . ":{$dispmin}";
-                            $row['pc_status'] = generate_display_field(['data_type' => '1', 'list_id' => 'apptstat'], $row['pc_apptstatus']);
-                            if ($row['pc_status'] == 'None') {
-                                $row['pc_status'] = 'Scheduled';
-                            }
-
-                            if (in_array($row['pc_catid'], $therapyGroupCategories)) {
-                                $row['groupName'] = getGroup($row['pc_gid'])['group_name'];
-                            }
-
-                            $row['uname'] = text($row['ufname'] . " " . $row['ulname']);
-                            $row['bgColor'] = $bgColor;
-                            $row['dayName'] = $dayname;
-                            $row['displayMeridiem'] = $displayMeridiem;
-                            $row['jsEvent'] = attr_js(preg_replace("/-/", "", $row['pc_eventDate'])) . ', ' . attr_js($row['pc_eid']);
-                            $appts[] = $row;
-                        }
-
-                        if ($resNotNull) {
-                            // Show Recall if one exists
-                            $query = sqlStatement("SELECT * FROM `medex_recalls` WHERE `r_pid` = ?", [(int)$pid]);
-                            $recallArr = [];
-                            $count2 = 0;
-                            while ($result2 = sqlFetchArray($query)) {
-                                //tabYourIt('recall', 'main/messages/messages.php?go=' + choice);
-                                //parent.left_nav.loadFrame('1', tabNAME, url);
-                                $recallArr[] = [
-                                    'date' => $result2['r_eventDate'],
-                                    'reason' => $result2['r_reason'],
-                                ];
-                                $count2++;
-                            }
-                            $id = "recall_ps_expand";
-                            $dispatchResult = $ed->dispatch(new CardRenderEvent('recall'), CardRenderEvent::EVENT_HANDLE);
-                            echo $twig->getTwig()->render('patient/card/recall.html.twig', [
-                                'title' => xl('Recall'),
-                                'id' => $id,
-                                'initiallyCollapsed' => shouldExpandByDefault($id),
-                                'recalls' => $recallArr,
-                                'recallsAvailable' => ($count < 1 && empty($count2)) ? false : true,
-                                'prependedInjection' => $dispatchResult->getPrependedInjection(),
-                                'appendedInjection' => $dispatchResult->getAppendedInjection(),
-                            ]);
-                        }
-                    } // End of Appointments Widget.
-
-                    /* Widget that shows recurrences for appointments. */
-                    $recurr = [];
-                    if (isset($pid) && !$GLOBALS['disable_calendar'] && $GLOBALS['appt_recurrences_widget'] && AclMain::aclCheckCore('patients', 'appt')) {
-                        $displayRecurrAppts = true;
-                        $count = 0;
-                        $toggleSet = true;
-                        $priorDate = "";
-
-                        //Fetch patient's recurrences. Function returns array with recurrence appointments' category, recurrence pattern (interpreted), and end date.
-                        $recurrences = fetchRecurrences($pid);
-                        if (!empty($recurrences)) {
-                            foreach ($recurrences as $row) {
-                                if (!recurrence_is_current($row['pc_endDate'])) {
-                                    continue;
-                                }
-
-                                if (ends_in_a_week($row['pc_endDate'])) {
-                                    $row['close_to_end'] = true;
-                                }
-                                $recurr[] = $row;
-                            }
-                        }
-                    }
-                    /* End of recurrence widget */
-
-                    // Show PAST appointments.
-                    // added by Terry Hill to allow reverse sorting of the appointments
-                    $direction = '1';
-                    if ($GLOBALS['num_past_appointments_to_show'] < 0) {
-                        $direction = '2';
-                        ($showpast = -1 * $GLOBALS['num_past_appointments_to_show']);
-                    } else {
-                        $showpast = $GLOBALS['num_past_appointments_to_show'];
-                    }
-
-                    if (isset($pid) && !$GLOBALS['disable_calendar'] && $showpast > 0 && AclMain::aclCheckCore('patients', 'appt')) {
-                        $displayPastAppts = true;
-
-                        $pastAppts = fetchXPastAppts($pid, $showpast, $direction); // This line added by epsdky
-
-                        $count = 0;
-
-                        foreach ($pastAppts as $row) {
-                            $count++;
-                            $dayname = date("D", strtotime($row['pc_eventDate']));
-                            $displayMeridiem = ($GLOBALS['time_display_format'] == 0) ? "" : "am";
-                            $disphour = substr($row['pc_startTime'], 0, 2) + 0;
-                            $dispmin = substr($row['pc_startTime'], 3, 2);
-                            if ($disphour >= 12) {
-                                $displayMeridiem = "pm";
-                                if ($disphour > 12 && $GLOBALS['time_display_format'] == 1) {
-                                    $disphour -= 12;
-                                }
-                            }
-
-                            $petitle = xl('(Click to edit)');
-                            if ($row['pc_hometext'] != "") {
-                                $petitle = xl('Comments') . ": " . ($row['pc_hometext']) . "\r\n" . $petitle;
-                            }
-                            $row['etitle'] = $petitle;
-
-                            $row['pc_status'] = generate_display_field(['data_type' => '1', 'list_id' => 'apptstat'], $row['pc_apptstatus']);
-
-                            $row['dayName'] = $dayname;
-                            $row['displayMeridiem'] = $displayMeridiem;
-                            $row['pc_eventTime'] = sprintf("%02d", $disphour) . ":{$dispmin}";
-                            $row['uname'] = text($row['ufname'] . " " . $row['ulname']);
-                            $row['jsEvent'] = attr_js(preg_replace("/-/", "", $row['pc_eventDate'])) . ', ' . attr_js($row['pc_eid']);
-                            $past_appts[] = $row;
-                        }
-                    }
-                    // END of past appointments
-
-                    // Display the Appt card
-                    $id = "appointments_ps_expand";
-                    $dispatchResult = $ed->dispatch(new CardRenderEvent('appointment'), CardRenderEvent::EVENT_HANDLE);
-                    echo $twig->getTwig()->render('patient/card/appointments.html.twig', [
-                        'title' => xl("Appointments"),
-                        'id' => $id,
-                        'initiallyCollapsed' => shouldExpandByDefault($id),
-                        'btnLabel' => "Add",
-                        'btnLink' => "return newEvt()",
-                        'linkMethod' => "javascript",
-                        'appts' => $appts,
-                        'recurrAppts' => $recurr,
-                        'pastAppts' => $past_appts,
-                        'displayAppts' => $displayAppts,
-                        'displayRecurrAppts' => $displayRecurrAppts,
-                        'displayPastAppts' => $displayPastAppts,
-                        'extraApptDate' => $extraApptDate,
-                        'therapyGroupCategories' => $therapyGroupCategories,
-                        'auth' => $resNotNull && (AclMain::aclCheckCore('patients', 'appt', '', 'write') || AclMain::aclCheckCore('patients', 'appt', '', 'addonly')),
-                        'resNotNull' => $resNotNull,
-                        'prependedInjection' => $dispatchResult->getPrependedInjection(),
-                        'appendedInjection' => $dispatchResult->getAppendedInjection(),
-                    ]);
+                    // APPOINTMENTS CARD MOVED TO TOP - removed from here
 
                     echo "<div id=\"stats_div\"></div>";
 
