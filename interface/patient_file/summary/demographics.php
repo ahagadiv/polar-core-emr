@@ -1492,6 +1492,12 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         $patient_procedures[] = $procedure;
                     }
                     
+                    // Debug: Log procedures data
+                    error_log("DEBUG: Procedures found for patient $pid: " . count($patient_procedures));
+                    if (!empty($patient_procedures)) {
+                        error_log("DEBUG: First procedure: " . print_r($patient_procedures[0], true));
+                    }
+                    
                     $id = "procedures_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('procedures'), CardRenderEvent::EVENT_HANDLE);
                     echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
@@ -1778,6 +1784,10 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     endif;
 
                     $sectionRenderEvents = $ed->dispatch(new SectionEvent('primary'), SectionEvent::EVENT_HANDLE);
+                    
+                    // Debug: Log demographics data
+                    error_log("DEBUG: Demographics data for patient $pid: " . print_r($result, true));
+                    
                     $sectionRenderEvents->addCard(new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]));
 
                     if (!$GLOBALS['hide_billing_widget']) {
