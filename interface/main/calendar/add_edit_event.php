@@ -1728,7 +1728,7 @@ function isRegularRepeat($repeat)
 </div>
 <div class="form-row mx-2">
     <div class="col-sm form-group">
-        <label id='title_apptstatus'><?php echo xlt('Status'); ?>:</label>
+        <label id='title_apptstatus'><?php echo xlt('Appointment Status'); ?>:</label>
         <label id='title_prefcat' class='font-weight-bold' style='display:none'>
             <?php echo xlt('Exclusive Category'); ?>:
             <i class="text-muted font-weight-normal ml-1"><?php echo xlt('(If selected, you will only be shown as available for this category)'); ?></i>
@@ -1750,9 +1750,9 @@ function isRegularRepeat($repeat)
 <?php
 if (empty($_GET['prov'])) { ?>
     <div class="col-sm form-group">
-        <label><?php echo xlt('Room Number'); ?>:</label>
+        <label><?php echo xlt('Care Setting'); ?>:</label>
         <?php
-            echo generate_select_list('form_room', 'patient_flow_board_rooms', $pcroom, xl('Room Number'));
+            echo generate_select_list('form_room', 'patient_flow_board_rooms', $pcroom, xl('Select the care setting where this service will be provided'));
         ?>
     </div>
     <?php } ?>

@@ -1,0 +1,119 @@
+/* POLAR Healthcare - Special styling for urgent appointments */
+
+/* POLAR STAT appointments - blinking indicator for urgency */
+.polar-stat-appointment {
+    animation: polarStatBlink 2s infinite;
+    border: 2px solid #ff4444 !important;
+    font-weight: bold !important;
+    background-color: #ffe6e6 !important;
+}
+
+/* Blinking animation for POLAR STAT */
+@keyframes polarStatBlink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* Enhanced styling for different appointment statuses */
+.appointment-status-scheduled {
+    background-color: #e6f3ff;
+    border-left: 4px solid #007bff;
+}
+
+.appointment-status-confirmed {
+    background-color: #e6ffe6;
+    border-left: 4px solid #28a745;
+}
+
+.appointment-status-urgent {
+    background-color: #ffe6e6;
+    border-left: 4px solid #ff4444;
+    animation: polarStatBlink 2s infinite;
+}
+
+.appointment-status-traveling {
+    background-color: #fff2cc;
+    border-left: 4px solid #ffc107;
+}
+
+.appointment-status-arrived {
+    background-color: #ffe6cc;
+    border-left: 4px solid #fd7e14;
+}
+
+.appointment-status-complete {
+    background-color: #ccffcc;
+    border-left: 4px solid #28a745;
+}
+
+.appointment-status-cancelled {
+    background-color: #cccccc;
+    border-left: 4px solid #6c757d;
+    text-decoration: line-through;
+}
+
+/* Care setting indicators */
+.care-setting-home {
+    background-color: #e6ffe6;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8em;
+}
+
+.care-setting-clinic {
+    background-color: #e6f3ff;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8em;
+}
+
+.care-setting-snf {
+    background-color: #fff2cc;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8em;
+}
+
+.care-setting-ltach {
+    background-color: #ffe6cc;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8em;
+}
+
+.care-setting-hospital {
+    background-color: #ffcccc;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8em;
+}
+
+/* Tooltip styling for better explanations */
+.polar-status-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.polar-status-tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.polar-status-tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
