@@ -38,6 +38,7 @@ require_once("$srcdir/options.inc.php");
 require_once("../history/history.inc.php");
 require_once("$srcdir/clinical_rules.php");
 require_once("$srcdir/group.inc.php");
+require_once("$srcdir/vascular_access_rules.php");
 require_once(__DIR__ . "/../../../library/appointments.inc.php");
 
 use OpenEMR\Billing\EDI270;
@@ -2200,7 +2201,6 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     }
 
 // Show POLAR Vascular Access Clinical Reminders
-                    require_once("$srcdir/vascular_access_rules.php");
                     // POLAR VASCULAR ACCESS SAFETY CHECKLIST - MOVED TO THIRD ROW
 
                     // APPOINTMENT LOGIC MOVED TO TOP - removed from here
