@@ -1339,10 +1339,10 @@ function find_available(extra) {
             $cid = $_REQUEST["catid"] ?? null;
         ?>
         <li class="nav-item">
-            <a class="nav-link<?php echo $normal;?>" href='add_edit_event.php?startampm=<?php echo attr($startm);?>&starttimeh=<?php echo attr($starth);?>&userid=<?php echo attr($uid);?>&starttimem=<?php echo attr($starttm);?>&date=<?php echo attr($dt);?>&catid=<?php echo attr($cid);?>'><?php echo xlt('Patient');?></a>
+            <a class="nav-link<?php echo $normal;?>" href='add_edit_event.php?startampm=<?php echo attr($startm);?>&starttimeh=<?php echo attr($starth);?>&userid=<?php echo attr($uid);?>&starttimem=<?php echo attr($starttm);?>&date=<?php echo attr($dt);?>&catid=<?php echo attr($cid);?>'><?php echo xlt('Schedule Appointment');?></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link<?php echo $provider_class;?>" href='add_edit_event.php?prov=true&startampm=<?php echo attr($startm);?>&starttimeh=<?php echo attr($starth);?>&userid=<?php echo attr($uid);?>&starttimem=<?php echo attr($starttm);?>&date=<?php echo attr($dt);?>&catid=<?php echo attr($cid);?>'><?php echo xlt('Provider');?></a>
+            <a class="nav-link<?php echo $provider_class;?>" href='add_edit_event.php?prov=true&startampm=<?php echo attr($startm);?>&starttimeh=<?php echo attr($starth);?>&userid=<?php echo attr($uid);?>&starttimem=<?php echo attr($starttm);?>&date=<?php echo attr($dt);?>&catid=<?php echo attr($cid);?>'><?php echo xlt('Provider Schedule');?></a>
         </li>
         <?php if ($have_group_global_enabled) :?>
             <li class="nav-item">
@@ -1501,7 +1501,7 @@ if ($_GET['group'] === true && $have_group_global_enabled) { ?>
         <?php if ($_GET['group'] == true) {
             echo xlt('Coordinating Counselors');
         } else {
-            echo xlt('Provider');
+            echo xlt('Assigned Clinician');
         } ?>:
      </label>
     <?php
@@ -1525,7 +1525,7 @@ if ($_GET['group'] === true && $have_group_global_enabled) { ?>
             }
         }
         // build the selection tool
-        echo "<select class='form-control' name='form_provider[]' id='provd' multiple='multiple' size='5' >";
+        echo "<select class='form-control' name='form_provider[]' id='provd' multiple='multiple' size='5' title='" . xla('Select which clinicians will provide care to this patient during this appointment') . "'>";
         while ($urow = sqlFetchArray($ures)) {
             echo "    <option value='" . attr($urow['id']) . "'";
             if ($userid) {
@@ -1569,7 +1569,7 @@ if ($_GET['group'] === true && $have_group_global_enabled) { ?>
                 $defaultProvider = $userid;
             }
         }
-        echo "<select class='form-control' name='form_provider' id='provd'>";
+        echo "<select class='form-control' name='form_provider' id='provd' title='" . xla('Select which clinician will provide care to this patient during this appointment') . "'>";
         while ($urow = sqlFetchArray($ures)) {
             echo "    <option value='" . attr($urow['id']) . "'";
             if ($urow['id'] == $defaultProvider) {
