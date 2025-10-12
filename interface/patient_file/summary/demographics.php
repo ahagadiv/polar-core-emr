@@ -1368,32 +1368,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         $appts[] = $row;
                     }
 
-                    if ($resNotNull) {
-                        // Show Recall if one exists
-                        $query = sqlStatement("SELECT * FROM `medex_recalls` WHERE `r_pid` = ?", [(int)$pid]);
-                        $recallArr = [];
-                        $count2 = 0;
-                        while ($result2 = sqlFetchArray($query)) {
-                            //tabYourIt('recall', 'main/messages/messages.php?go=' + choice);
-                            //parent.left_nav.loadFrame('1', tabNAME, url);
-                            $recallArr[] = [
-                                'date' => $result2['r_eventDate'],
-                                'reason' => $result2['r_reason'],
-                            ];
-                            $count2++;
-                        }
-                        $id = "recall_ps_expand";
-                        $dispatchResult = $ed->dispatch(new CardRenderEvent('recall'), CardRenderEvent::EVENT_HANDLE);
-                        echo $twig->getTwig()->render('patient/card/recall.html.twig', [
-                            'title' => xl('Recall'),
-                            'id' => $id,
-                            'initiallyCollapsed' => shouldExpandByDefault($id),
-                            'recalls' => $recallArr,
-                            'recallsAvailable' => ($count < 1 && empty($count2)) ? false : true,
-                            'prependedInjection' => $dispatchResult->getPrependedInjection(),
-                            'appendedInjection' => $dispatchResult->getAppendedInjection(),
-                        ]);
-                    }
+                    // Recall data will be rendered with other cards later
                 } // End of Appointments Widget.
 
                 /* Widget that shows recurrences for appointments. */
@@ -1697,6 +1672,34 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     echo "</div>";
                 endif;
                 
+                // RECALL CARD (moved here for proper layout)
+                if ($resNotNull) {
+                    // Show Recall if one exists
+                    $query = sqlStatement("SELECT * FROM `medex_recalls` WHERE `r_pid` = ?", [(int)$pid]);
+                    $recallArr = [];
+                    $count2 = 0;
+                    while ($result2 = sqlFetchArray($query)) {
+                        $recallArr[] = [
+                            'date' => $result2['r_eventDate'],
+                            'reason' => $result2['r_reason'],
+                        ];
+                        $count2++;
+                    }
+                    $id = "recall_ps_expand";
+                    $dispatchResult = $ed->dispatch(new CardRenderEvent('recall'), CardRenderEvent::EVENT_HANDLE);
+                    echo "<div class=\"$col\">";
+                    echo $twig->getTwig()->render('patient/card/recall.html.twig', [
+                        'title' => xl('Recall'),
+                        'id' => $id,
+                        'initiallyCollapsed' => shouldExpandByDefault($id),
+                        'recalls' => $recallArr,
+                        'recallsAvailable' => ($count < 1 && empty($count2)) ? false : true,
+                        'prependedInjection' => $dispatchResult->getPrependedInjection(),
+                        'appendedInjection' => $dispatchResult->getAppendedInjection(),
+                    ]);
+                    echo "</div>";
+                }
+                
                 ?>
             </div>
             <div class="row">
@@ -1739,7 +1742,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     $sectionRenderEvents->addCard(new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]));
 
                     if (!$GLOBALS['hide_billing_widget']) {
-                        $sectionRenderEvents->addCard(new BillingViewCard($pid, $insco_name, $result['billing_note'], $result3, ['dispatcher' => $ed]));
+                        $sectionRenderEvents->addCard(new BillingViewCard($pid, $insco_name, $result['billing_note'], $result3 ?: [], ['dispatcher' => $ed]));
                     }
 
                     if (!in_array('card_insurance', $hiddenCards)) {
