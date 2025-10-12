@@ -2241,7 +2241,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     ?>
                 </div> <!-- end right column div -->
             </div> <!-- end div.main > row:first  -->
-            --> <!-- End commented out additional cards row -->
+            <!-- End commented out additional cards row -->
         </div> <!-- end main content div -->
     </div><!-- end container div -->
     <?php $oemr_ui->oeBelowContainerDiv(); ?>
