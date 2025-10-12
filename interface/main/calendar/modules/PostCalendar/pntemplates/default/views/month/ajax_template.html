@@ -653,6 +653,9 @@ foreach ($providers as $provider) {
                 else{
                     $styleAttr = " style='background-color: var(--gray300)'";
                 }
+            } else {
+                // Ensure STAT appointments have red background and blinking
+                $styleAttr = " style='background-color: #ff0000 !important; animation: polarStatBlink 1.5s infinite !important;'";
             }
             
             if($_SESSION['pc_facility'] == 0){
