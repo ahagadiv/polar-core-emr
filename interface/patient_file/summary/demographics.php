@@ -1480,10 +1480,18 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 
                 // 2. PROCEDURES CARD (top-middle)
                 if (AclMain::aclCheckCore('patients', 'proc', '', 'readonly') || AclMain::aclCheckCore('patients', 'proc', '', 'write') || AclMain::aclCheckCore('patients', 'proc', '', 'addonly')) {
+                    // Fetch patient procedures data
+                    $procedures_query = "SELECT * FROM patient_procedures WHERE patient_id = ? AND status IN ('ACTIVE', 'COMPLETED') ORDER BY procedure_date DESC LIMIT 5";
+                    $procedures_result = sqlStatement($procedures_query, [$pid]);
+                    $patient_procedures = [];
+                    while ($procedure = sqlFetchArray($procedures_result)) {
+                        $patient_procedures[] = $procedure;
+                    }
+                    
                     $id = "procedures_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('procedures'), CardRenderEvent::EVENT_HANDLE);
                     echo "<div class=\"col-md-4 p-1\">";
-                    echo $twig->getTwig()->render('patient/card/procedures.html.twig', [
+                    echo $twig->getTwig()->render('patient/card/patient_procedures.html.twig', [
                         'title' => xl("Procedures"),
                         'id' => $id,
                         'initiallyCollapsed' => shouldExpandByDefault($id),
@@ -1492,6 +1500,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'linkMethod' => "javascript",
                         'btnClass' => "iframe",
                         'auth' => AclMain::aclCheckCore('patients', 'proc', '', ['write', 'addonly']),
+                        'patient_procedures' => $patient_procedures,
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                     ]);
