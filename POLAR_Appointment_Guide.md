@@ -40,16 +40,15 @@ The appointment system has been customized specifically for POLAR Healthcare's s
 
 ### **🏠 Primary Settings:**
 - **Home Visit**: Default for most POLAR services
-- **POLAR Clinic**: Services provided at POLAR clinic location
+- **Clinic**: Services provided at POLAR clinic location
 
 ### **🏥 Facility-Based Care:**
 - **Skilled Nursing Facility (SNF)**: Services at nursing homes
 - **LTACH**: Long-term acute care hospital
 - **Hospital**: Inpatient hospital services
 
-### **💻 Special Settings:**
-- **Telehealth Visit**: Remote consultation
-- **Office Visit**: Traditional office-based visit
+### **🏢 Office Settings:**
+- **POLAR | Office Visit**: Patient visits POLAR office for services
 
 ---
 
@@ -59,7 +58,7 @@ The appointment system has been customized specifically for POLAR Healthcare's s
 1. **Patient**: Select patient
 2. **Assigned Clinician**: Choose who will provide care
 3. **Category**: Select service type (Vascular Access, Home Health, etc.)
-4. **Care Setting**: Choose "Home Visit" (default)
+4. **Care Setting**: Choose "Home Visit" (default) or appropriate setting
 5. **Status**: Start with "S - Scheduled"
 6. **Save**
 
@@ -72,8 +71,9 @@ The appointment system has been customized specifically for POLAR Healthcare's s
 - Update status to **SMS**, **CALL**, or **EMAIL** when patient confirms
 - This helps track communication methods
 
-### **🏥 Facility Visits:**
-- For SNF, LTACH, or Hospital visits, select appropriate **Care Setting**
+### **🏥 Facility/Office Visits:**
+- For SNF, LTACH, Hospital, or Office visits, select appropriate **Care Setting**
+- **POLAR | Office Visit** = Patient coming to POLAR office
 - Update status as clinician travels and arrives
 
 ---
@@ -94,10 +94,11 @@ The appointment system has been customized specifically for POLAR Healthcare's s
 
 ### **🏠 Care Setting Badges:**
 - **Green badge**: Home Visit
-- **Blue badge**: POLAR Clinic
+- **Blue badge**: Clinic
 - **Yellow badge**: SNF
 - **Orange badge**: LTACH
 - **Red badge**: Hospital
+- **Purple badge**: POLAR | Office Visit
 
 ---
 
