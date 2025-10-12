@@ -84,6 +84,8 @@ The appointment system has been customized specifically for POLAR Healthcare's s
 - **Red border** with **blinking animation**
 - **Bold text** to stand out
 - **Red background tint**
+- **Category labels** displayed on calendar events
+- **"POLAR STAT"** label visible on calendar
 
 ### **📊 Status Colors:**
 - **Blue**: Scheduled/Confirmed
@@ -99,6 +101,12 @@ The appointment system has been customized specifically for POLAR Healthcare's s
 - **Orange badge**: LTACH
 - **Red badge**: Hospital
 - **Purple badge**: POLAR | Office Visit
+
+### **📋 Calendar Event Display:**
+- **Patient names** with **category labels** (e.g., "McCaskill, Faith - Vascular Access")
+- **POLAR STAT** appointments show **"McCaskill, Faith - POLAR STAT"**
+- **Category labels** help identify service type at a glance
+- **Clinicians** sidebar (formerly "Providers") for clearer staff identification
 
 ---
 

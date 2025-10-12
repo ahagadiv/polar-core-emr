@@ -288,7 +288,7 @@ foreach ($atmp as $currdate) {
 </div>
 
 <div id="providerPicker">
-[-php-] echo xlt('Providers'); [-/php-]
+[-php-] echo xlt('Clinicians'); [-/php-]
 <div>
 [-php-]
 // ==============================
@@ -478,6 +478,11 @@ foreach ($providers as $provider) {
             }
             // eventViewClass allows the event class to override the template (such as from a dispatched system event).
             $evtClass = $event['eventViewClass'] ?? $evtClass;
+            
+            // Add POLAR STAT blinking class for urgent appointments
+            if ($isStatAppointment) {
+                $evtClass .= ' polar-stat-appointment';
+            }
 
             // now, output the event DIV
 
@@ -516,6 +521,19 @@ foreach ($providers as $provider) {
             }
             else {
                 $displayTime .= (date(":ia", $startDateTime));
+            }
+            
+            // Add category label for POLAR Healthcare
+            $categoryLabel = "";
+            if ($catname && $catname != "General") {
+                $categoryLabel = " - " . $catname;
+            }
+            
+            // Check for POLAR STAT status for blinking
+            $isStatAppointment = false;
+            if ($event['apptstatus'] == 'STAT') {
+                $isStatAppointment = true;
+                $categoryLabel = " - POLAR STAT";
             }
 
             if ($comment && $GLOBALS['calendar_appt_style'] < 4) $title .= " " . $comment;
@@ -575,6 +593,8 @@ foreach ($providers as $provider) {
                             $content .= ")";
                         }
                     }
+                    // Add category label for POLAR Healthcare
+                    $content .= $categoryLabel;
                     if ($catid == 1) $content .= "</s>";
                     $content .= "</a>";
                 }
