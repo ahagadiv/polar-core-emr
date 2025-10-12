@@ -523,17 +523,17 @@ foreach ($providers as $provider) {
                 $displayTime .= (date(":ia", $startDateTime));
             }
             
-            // Add category label for POLAR Healthcare
-            $categoryLabel = "";
-            if ($catname && $catname != "General") {
-                $categoryLabel = " - " . $catname;
-            }
-            
-            // Check for POLAR STAT status for blinking
+            // Check for POLAR STAT status for blinking FIRST
             $isStatAppointment = false;
             if ($event['apptstatus'] == 'STAT') {
                 $isStatAppointment = true;
                 $categoryLabel = " - POLAR STAT";
+            } else {
+                // Add category label for POLAR Healthcare
+                $categoryLabel = "";
+                if ($catname && $catname != "General") {
+                    $categoryLabel = " - " . $catname;
+                }
             }
 
             if ($comment && $GLOBALS['calendar_appt_style'] < 4) $title .= " " . $comment;

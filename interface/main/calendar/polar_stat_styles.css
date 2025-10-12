@@ -1,13 +1,19 @@
 /* POLAR Healthcare - Special styling for urgent appointments */
 
+/* Test to make sure CSS is loading */
+.month_event {
+    border-radius: 3px;
+}
+
 /* POLAR STAT appointments - blinking indicator for urgency */
 .polar-stat-appointment {
     animation: polarStatBlink 1.5s infinite !important;
-    border: 3px solid #ff0000 !important;
+    border: 5px solid #ff0000 !important;
     font-weight: bold !important;
-    background-color: #ff4444 !important;
+    background-color: #ff0000 !important;
     color: white !important;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8) !important;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 1) !important;
+    font-size: 14px !important;
 }
 
 /* Blinking animation for POLAR STAT */
