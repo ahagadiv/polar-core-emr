@@ -2,17 +2,28 @@
 
 /* POLAR STAT appointments - blinking indicator for urgency */
 .polar-stat-appointment {
-    animation: polarStatBlink 2s infinite;
-    border: 2px solid #ff4444 !important;
+    animation: polarStatBlink 1.5s infinite !important;
+    border: 3px solid #ff0000 !important;
     font-weight: bold !important;
-    background-color: #ffe6e6 !important;
+    background-color: #ff4444 !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8) !important;
 }
 
 /* Blinking animation for POLAR STAT */
 @keyframes polarStatBlink {
-    0% { opacity: 1; }
-    50% { opacity: 0.3; }
-    100% { opacity: 1; }
+    0% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.4; 
+        transform: scale(1.02);
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
 }
 
 /* Enhanced styling for different appointment statuses */
