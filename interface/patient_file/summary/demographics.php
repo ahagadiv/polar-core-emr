@@ -1217,34 +1217,6 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     return array_filter($i, fn($_i): bool => ($_i['outcome'] != 1) && (empty($_i['enddate']) || (strtotime($_i['enddate']) > strtotime('now'))));
                 }
 
-                // APPOINTMENTS CARD (moved to top for quick access)
-                if (isset($pid) && !$GLOBALS['disable_calendar'] && AclMain::aclCheckCore('patients', 'appt')) {
-                    // Display the Appt card
-                    $id = "appointments_ps_expand";
-                    $dispatchResult = $ed->dispatch(new CardRenderEvent('appointment'), CardRenderEvent::EVENT_HANDLE);
-                    echo "<div class=\"$col\">";
-                    echo $twig->getTwig()->render('patient/card/appointments.html.twig', [
-                        'title' => xl("Appointments"),
-                        'id' => $id,
-                        'initiallyCollapsed' => shouldExpandByDefault($id),
-                        'btnLabel' => "Add",
-                        'btnLink' => "return newEvt()",
-                        'linkMethod' => "javascript",
-                        'appts' => $appts,
-                        'recurrAppts' => $recurr,
-                        'pastAppts' => $past_appts,
-                        'displayAppts' => $displayAppts,
-                        'displayRecurrAppts' => $displayRecurrAppts,
-                        'displayPastAppts' => $displayPastAppts,
-                        'extraApptDate' => $extraApptDate,
-                        'therapyGroupCategories' => $therapyGroupCategories,
-                        'auth' => $resNotNull && (AclMain::aclCheckCore('patients', 'appt', '', 'write') || AclMain::aclCheckCore('patients', 'appt', '', 'addonly')),
-                        'resNotNull' => $resNotNull,
-                        'prependedInjection' => $dispatchResult->getPrependedInjection(),
-                        'appendedInjection' => $dispatchResult->getAppendedInjection(),
-                    ]);
-                    echo "</div>";
-                }
 
                 // ALLERGY CARD
                 if ($allergy === 1) {
@@ -1374,7 +1346,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     $viewArgs['content'] = ob_get_contents();
                     ob_end_clean();
 
-                    // PRESCRIPTIONS CARD MOVED TO BOTTOM - will be added later
+                    echo "<div class='col m-0 p-0 mx-1'>";
+                    echo $t->render('patient/card/rx.html.twig', $viewArgs); // render core prescription card
+                    echo "</div>";
                 endif;
                 
                 // POLAR Healthcare Procedures Box
@@ -1441,69 +1415,6 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 echo $t->render('patient/card/rapid_response_contact.html.twig', $viewArgs);
                 echo "</div>";
                 
-                // PRESCRIPTIONS CARD (moved to bottom)
-                if ($rx === 1) :
-                    if ($GLOBALS['erx_enable'] && ($display_current_medications_below ?? '') == 1) {
-                        $sql = "SELECT * FROM prescriptions WHERE patient_id = ? AND active = '1'";
-                        $res = sqlStatement($sql, [$pid]);
-
-                        $rxArr = [];
-                        while ($row = sqlFetchArray($res)) {
-                            $row['unit'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_units'], $row['unit']);
-                            $row['form'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_form'], $row['form']);
-                            $row['route'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_route'], $row['route']);
-                            $row['interval'] = generate_display_field(['data_type' => '1', 'list_id' => 'drug_interval'], $row['interval']);
-                            $rxArr[] = $row;
-                        }
-                        $id = "current_prescriptions_ps_expand";
-                        $viewArgs = [
-                            'title' => xl('Current Medications'),
-                            'id' => $id,
-                            'forceAlwaysOpen' => false,
-                            'initiallyCollapsed' => shouldExpandByDefault($id),
-                            'auth' => false,
-                            'rxList' => $rxArr,
-                        ];
-
-                        echo $t->render('patient/card/erx.html.twig', $viewArgs);
-                    }
-
-                    $id = "prescriptions_ps_expand";
-                    $viewArgs = [
-                        'title' => xl("Prescriptions"),
-                        'card_container_class_list' => ['flex-fill', 'mx-1', 'card'],
-                        'id' => $id,
-                        'forceAlwaysOpen' => false,
-                        'initiallyCollapsed' => shouldExpandByDefault($id),
-                        'btnLabel' => "Edit",
-                        'auth' => AclMain::aclCheckCore('patients', 'rx', '', ['write', 'addonly']),
-                    ];
-
-                    if ($GLOBALS['erx_enable']) {
-                        $viewArgs['title'] = 'Prescription History';
-                        $viewArgs['btnLabel'] = 'Add';
-                        $viewArgs['btnLink'] = "{$GLOBALS['webroot']}/interface/eRx.php?page=compose";
-                    } else {
-                        $viewArgs['btnLink'] = "editScripts('{$GLOBALS['webroot']}/controller.php?prescription&list&id=" . attr_url($pid) . "')";
-                        $viewArgs['linkMethod'] = "javascript";
-                        $viewArgs['btnClass'] = "iframe";
-                    }
-
-                    $cwd = getcwd();
-                    chdir("../../../");
-                    $c = new Controller();
-                    // This is a hacky way to get a Smarty template from the controller and injecting it into
-                    // a Twig template. This reduces the amount of refactoring that is required but ideally the
-                    // Smarty template should be upgraded to Twig
-                    ob_start();
-                    echo $c->act(['prescription' => '', 'fragment' => '', 'patient_id' => $pid]);
-                    $viewArgs['content'] = ob_get_contents();
-                    ob_end_clean();
-
-                    echo "<div class='col m-0 p-0 mx-1'>";
-                    echo $t->render('patient/card/rx.html.twig', $viewArgs); // render core prescription card
-                    echo "</div>";
-                endif;
                 ?>
             </div>
             <div class="row">
@@ -2236,7 +2147,29 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     }
                     // END of past appointments
 
-                    // APPOINTMENTS CARD MOVED TO TOP - removed from here
+                    // Display the Appt card
+                    $id = "appointments_ps_expand";
+                    $dispatchResult = $ed->dispatch(new CardRenderEvent('appointment'), CardRenderEvent::EVENT_HANDLE);
+                    echo $twig->getTwig()->render('patient/card/appointments.html.twig', [
+                        'title' => xl("Appointments"),
+                        'id' => $id,
+                        'initiallyCollapsed' => shouldExpandByDefault($id),
+                        'btnLabel' => "Add",
+                        'btnLink' => "return newEvt()",
+                        'linkMethod' => "javascript",
+                        'appts' => $appts,
+                        'recurrAppts' => $recurr,
+                        'pastAppts' => $past_appts,
+                        'displayAppts' => $displayAppts,
+                        'displayRecurrAppts' => $displayRecurrAppts,
+                        'displayPastAppts' => $displayPastAppts,
+                        'extraApptDate' => $extraApptDate,
+                        'therapyGroupCategories' => $therapyGroupCategories,
+                        'auth' => $resNotNull && (AclMain::aclCheckCore('patients', 'appt', '', 'write') || AclMain::aclCheckCore('patients', 'appt', '', 'addonly')),
+                        'resNotNull' => $resNotNull,
+                        'prependedInjection' => $dispatchResult->getPrependedInjection(),
+                        'appendedInjection' => $dispatchResult->getAppendedInjection(),
+                    ]);
 
                     echo "<div id=\"stats_div\"></div>";
 
