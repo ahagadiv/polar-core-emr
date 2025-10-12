@@ -859,7 +859,10 @@ foreach ($providers as $provider) {
           // For "OUT" events, applying the background color in CSS.
 
             if ($event['catid'] != "6") {
-              $background_string = "; background-color:" . attr($color);
+              $background_string = "";
+              if (!(isset($isStatAppointment) && $isStatAppointment)) {
+                  $background_string = "; background-color:" . attr($color);
+              }
               echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " event' style='top:".$evtTop."; height:".$evtHeight.
               $background_string.
               "; $divWidth".
@@ -868,7 +871,10 @@ foreach ($providers as $provider) {
               " id='" . attr($eventdate) . "-" . attr($eventid) . "-" . attr($pccattype) . "'".
               ">";
             } else {
-              $background_string= "; background-color:" . attr($color);
+              $background_string = "";
+              if (!(isset($isStatAppointment) && $isStatAppointment)) {
+                  $background_string = "; background-color:" . attr($color);
+              }
               echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " hiddenevent' style='top:".$evtTop."; height:".$evtHeight.
               $background_string.
               "; $divWidth".
@@ -897,9 +903,12 @@ foreach ($providers as $provider) {
                echo "</div>\n";
            }
 
-           // output the DIV and content
-           // For "OUT" events, applying the background color in CSS.
-          $background_string= "; background-color:".$event["catcolor"];
+          // output the DIV and content
+          // For "OUT" events, applying the background color in CSS.
+          $background_string = "";
+          if (!(isset($isStatAppointment) && $isStatAppointment)) {
+              $background_string = "; background-color:".$event["catcolor"];
+          }
           echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " event' style='top:".$evtTop."; height:".$evtHeight.
                $background_string.
                "; $divWidth".
