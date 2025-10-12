@@ -1,9 +1,5 @@
 /* POLAR Healthcare - Special styling for urgent appointments */
 
-/* Test to make sure CSS is loading */
-.month_event {
-    border-radius: 3px;
-}
 
 /* POLAR STAT appointments - blinking indicator for urgency */
 .polar-stat-appointment {

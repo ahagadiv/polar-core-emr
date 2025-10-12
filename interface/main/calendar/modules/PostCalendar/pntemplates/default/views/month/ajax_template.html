@@ -482,8 +482,6 @@ foreach ($providers as $provider) {
             // Add POLAR STAT blinking class for urgent appointments
             if (isset($isStatAppointment) && $isStatAppointment) {
                 $evtClass .= ' polar-stat-appointment';
-                // Debug: Add a visible indicator
-                $categoryLabel .= ' [BLINKING]';
             }
 
             // now, output the event DIV
@@ -655,9 +653,6 @@ foreach ($providers as $provider) {
                 else{
                     $styleAttr = " style='background-color: var(--gray300)'";
                 }
-            } else {
-                // Debug: Add inline style for STAT appointments to test
-                $styleAttr = " style='background-color: red !important; animation: polarStatBlink 1.5s infinite;'";
             }
             
             if($_SESSION['pc_facility'] == 0){
