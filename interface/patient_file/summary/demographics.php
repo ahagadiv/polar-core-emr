@@ -1,5 +1,7 @@
 <?php
 
+echo "<!-- DEBUG: demographics.php script started -->";
+
 // Debug: Check if demographics.php is being called
 if ($_POST && isset($_POST['action'])) {
     error_log("Demographics.php called with action: " . $_POST['action']);
@@ -1451,6 +1453,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 // ===============================================
                 // ORGANIZED 3x3 GRID LAYOUT - TABLE BASED
                 // ===============================================
+                echo "<!-- DEBUG: About to start table structure -->";
                 echo "<table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" border=\"0\">";
                 
                 // TOP ROW
