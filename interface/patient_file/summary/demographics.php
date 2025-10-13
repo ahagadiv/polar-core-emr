@@ -216,7 +216,12 @@ if (isset($_GET['set_pid'])) {
     $newPatient = $ptService->findByPid($pid);
     echo "<!-- DEBUG: newPatient: " . print_r($newPatient, true) . " -->";
     if ($newPatient) {
-    $ptService->touchRecentPatientList($newPatient);
+        try {
+            $ptService->touchRecentPatientList($newPatient);
+            echo "<!-- DEBUG: touchRecentPatientList completed successfully -->";
+        } catch (Exception $e) {
+            echo "<!-- DEBUG: touchRecentPatientList failed: " . $e->getMessage() . " -->";
+        }
     } else {
         echo "<!-- DEBUG: newPatient is null, skipping touchRecentPatientList -->";
     }
