@@ -276,8 +276,15 @@ function loadCurrentPatient()
 {
     var patientId = app_view_model.application_data.patient() ? app_view_model.application_data.patient().pubpid() : null;
     if (!patientId) {
-        console.log("No patient selected");
-        return;
+        // Try to get patient ID from URL parameters or session
+        var urlParams = new URLSearchParams(window.location.search);
+        var pidFromUrl = urlParams.get('pid') || urlParams.get('set_pid');
+        if (pidFromUrl) {
+            patientId = pidFromUrl;
+        } else {
+            console.log("No patient selected and no PID in URL");
+            return;
+        }
     }
     var url=webroot_url+'/interface/patient_file/summary/demographics.php?set_pid=' + encodeURIComponent(patientId);
     navigateTab(url, "pat", function () {

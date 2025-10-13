@@ -41,7 +41,7 @@ class C_Procedure extends Controller
         $patient_data = $this->getPatientData($patient_id);
         
         // Render using Twig template
-        $twig = TwigContainer::getInstance();
+        $twig = new TwigContainer(null, $GLOBALS['kernel']);
         echo $twig->getTwig()->render('patient/card/patient_procedures.html.twig', [
             'patient_procedures' => $procedures,
             'patient' => $patient_data,
