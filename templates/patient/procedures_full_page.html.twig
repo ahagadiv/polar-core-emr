@@ -149,10 +149,16 @@
 <body>
     <div class="procedures-container">
         <div class="procedures-header">
-            <h2>Procedures - Patient ID: {{ pid }}</h2>
+            <h2>Procedures Management</h2>
             <div class="patient-info">
                 <strong>Patient:</strong> {{ patient.fname }} {{ patient.lname }} ({{ patient.pubpid }})
             </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <a href="{{ webroot }}/interface/patient_file/summary/demographics.php?set_pid={{ pid }}" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Back to Dashboard
+            </a>
         </div>
         
         {% if patient_procedures and patient_procedures|length > 0 %}
@@ -192,7 +198,7 @@
                         </div>
                         <div class="procedure-actions">
                             <a href="{{ webroot }}/controller.php?procedure&edit&id={{ pid }}&proc_id={{ procedure.id }}" class="edit">✏️ Edit</a>
-                            <a href="{{ webroot }}/controller.php?procedure&delete&id={{ pid }}&proc_id={{ procedure.id }}" class="delete" onclick="return confirm('Are you sure you want to delete this procedure?');">🗑️ Delete</a>
+                            <a href="{{ webroot }}/controller.php?procedure&delete&id={{ pid }}&proc_id={{ procedure.id }}" class="delete" onclick="return confirmDelete('{{ procedure.cpt_code }}', '{{ procedure.procedure_description|slice(0, 50) }}...');">🗑️ Delete</a>
                         </div>
                     </div>
                 {% endfor %}
@@ -205,5 +211,14 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        function confirmDelete(cptCode, description) {
+            return confirm('Are you sure you want to delete this procedure?\n\n' +
+                          'CPT Code: ' + cptCode + '\n' +
+                          'Description: ' + description + '\n\n' +
+                          'This action cannot be undone.');
+        }
+    </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add New Procedure - Patient ID: {{ pid }}</title>
+    <title>Edit Procedure - Patient ID: {{ pid }}</title>
     <link rel="stylesheet" href="{{ webroot }}/public/themes/style_cobalt_blue.css?v=81" />
     <link rel="stylesheet" href="{{ webroot }}/public/themes/tabs_style_compact.css?v=81" />
     <script src="{{ webroot }}/public/assets/jquery/dist/jquery.min.js?v=81"></script>
@@ -118,23 +118,24 @@
 <body>
     <div class="form-container">
         <div class="form-header">
-            <h2>Add New Procedure for Patient ID: {{ pid }}</h2>
+            <h2>Edit Procedure for Patient ID: {{ pid }}</h2>
         </div>
-        <form id="addProcedureForm" action="{{ webroot }}/controller.php?procedure&save&id={{ pid }}" method="POST">
+        <form id="editProcedureForm" action="{{ webroot }}/controller.php?procedure&save&id={{ pid }}" method="POST">
             <input type="hidden" name="csrf_token_form" value="{{ csrf_token_form }}">
             <input type="hidden" name="pid" value="{{ pid }}">
+            <input type="hidden" name="procedure_id" value="{{ procedure.id }}">
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="procedureDate" class="form-label">Procedure Date:</label>
-                    <input type="datetime-local" id="procedureDate" name="date" class="form-control" value="{{ "now"|date("Y-m-d\\TH:i") }}" required>
+                    <input type="datetime-local" id="procedureDate" name="date" class="form-control" value="{{ procedure.procedure_date|date('Y-m-d\\TH:i') }}" required>
                 </div>
                 <div class="form-group">
                     <label for="status" class="form-label">Status:</label>
                     <select id="status" name="status" class="form-control" required>
-                        <option value="ACTIVE" selected>Active</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="CANCELLED">Cancelled</option>
+                        <option value="ACTIVE" {% if procedure.status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                        <option value="COMPLETED" {% if procedure.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                        <option value="CANCELLED" {% if procedure.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
                     </select>
                 </div>
             </div>
@@ -142,19 +143,19 @@
             <div class="form-group">
                 <label for="cptCode" class="form-label">CPT Code:</label>
                 <div class="input-group">
-                    <input type="text" id="cptCode" name="cpt_code" class="form-control" placeholder="e.g., 36569, A4215, 76937" required onchange="lookupCPTCode()">
+                    <input type="text" id="cptCode" name="cpt_code" class="form-control" placeholder="e.g., 36569, A4215, 76937" value="{{ procedure.cpt_code }}" required onchange="lookupCPTCode()">
                     <button type="button" class="btn btn-outline-primary" onclick="searchCPTCodes()">Search CPT</button>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="description" class="form-label">Procedure Description:</label>
-                <textarea id="description" name="description" class="form-control" rows="5" required></textarea>
+                <textarea id="description" name="description" class="form-control" rows="5" required>{{ procedure.procedure_description }}</textarea>
             </div>
 
             <div class="form-group">
                 <label for="notes" class="form-label">Notes:</label>
-                <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+                <textarea id="notes" name="notes" class="form-control" rows="3">{{ procedure.notes }}</textarea>
             </div>
 
             <div class="common-cpt-codes">
@@ -192,7 +193,7 @@
             </div>
 
             <div style="margin-top: 30px; text-align: right;">
-                <button type="submit" class="btn-submit">Add Procedure</button>
+                <button type="submit" class="btn-submit">Update Procedure</button>
                 <button type="button" class="btn-cancel" onclick="history.back()">Cancel</button>
             </div>
         </form>
@@ -200,47 +201,23 @@
 
     <script>
         // Common CPT codes data
-        let commonCptCodes = {};
+        const commonCptCodes = {
+            "93970": "Duplex scan of extremity veins; complete bilateral study",
+            "36561": "Insertion of tunneled centrally inserted central venous catheter, without subcutaneous port or pump; age 5 years or older",
+            "36571": "Repair of tunneled or non-tunneled centrally inserted central venous catheter, without subcutaneous port or pump, any age, including fluoroscopic guidance, when performed",
+            "76937": "Ultrasound guidance for vascular access requiring ultrasound evaluation of potential access sites, documentation of selected vessel patency, concurrent realtime ultrasound visualization of vascular needle entry, with permanent recording and reporting",
+            "99213": "Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of 3 medical decision making components",
+            "A4301": "BARD MIDLINE KIT",
+            "36569": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, without guidance, age 5 years or older"
+        };
 
-        // Initialize everything when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set today's date as default
-            var dateInput = document.getElementById('procedureDate');
-            if (dateInput) {
-                var now = new Date();
-                var year = now.getFullYear();
-                var month = String(now.getMonth() + 1).padStart(2, '0');
-                var day = String(now.getDate()).padStart(2, '0');
-                var hours = String(now.getHours()).padStart(2, '0');
-                var minutes = String(now.getMinutes()).padStart(2, '0');
-                dateInput.value = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
-            }
-
-            // Initialize common CPT codes
-            commonCptCodes = {
-                "93970": "Duplex scan of extremity veins; complete bilateral study",
-                "36561": "Insertion of tunneled centrally inserted central venous catheter, without subcutaneous port or pump; age 5 years or older",
-                "36571": "Repair of tunneled or non-tunneled centrally inserted central venous catheter, without subcutaneous port or pump, any age, including fluoroscopic guidance, when performed",
-                "76937": "Ultrasound guidance for vascular access requiring ultrasound evaluation of potential access sites, documentation of selected vessel patency, concurrent realtime ultrasound visualization of vascular needle entry, with permanent recording and reporting",
-                "99213": "Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of 3 medical decision making components",
-                "A4301": "BARD MIDLINE KIT",
-                "36569": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, without guidance, age 5 years or older"
-            };
-
-            // Handle click on common CPT codes
-            document.querySelectorAll('.common-cpt-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const code = this.dataset.code;
-                    const desc = this.dataset.desc;
-                    document.getElementById('cptCode').value = code;
-                    document.getElementById('description').value = desc;
-                    
-                    // Add visual feedback
-                    this.style.backgroundColor = '#d4edda';
-                    setTimeout(() => {
-                        this.style.backgroundColor = '';
-                    }, 1000);
-                });
+        // Handle click on common CPT codes
+        document.querySelectorAll('.common-cpt-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const code = this.dataset.code;
+                const desc = this.dataset.desc;
+                document.getElementById('cptCode').value = code;
+                document.getElementById('description').value = desc;
             });
         });
 
@@ -491,20 +468,6 @@
         // Placeholder functions for compatibility
         function set_related() {}
         function set_related_target() {}
-        
-        // Form submission
-        document.getElementById('addProcedureForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Saving...';
-            submitBtn.disabled = true;
-            
-            // Submit the form normally (let the server handle it)
-            this.submit();
-        });
     </script>
 </body>
 </html>

@@ -275,10 +275,12 @@ function encounterList()
 function loadCurrentPatient()
 {
     var patientId = app_view_model.application_data.patient() ? app_view_model.application_data.patient().pid() : null;
+    console.log("loadCurrentPatient called, patientId:", patientId);
     if (!patientId) {
         // Try to get patient ID from URL parameters or session
         var urlParams = new URLSearchParams(window.location.search);
         var pidFromUrl = urlParams.get('pid') || urlParams.get('set_pid');
+        console.log("No patient in app_view_model, checking URL params:", pidFromUrl);
         if (pidFromUrl) {
             patientId = pidFromUrl;
         } else {
@@ -287,7 +289,9 @@ function loadCurrentPatient()
         }
     }
     var url=webroot_url+'/interface/patient_file/summary/demographics.php?set_pid=' + encodeURIComponent(patientId);
+    console.log("Loading demographics.php with URL:", url);
     navigateTab(url, "pat", function () {
+        console.log("navigateTab callback executed");
         activateTabByName("pat",true);
         // Update tab title to "Dashboard"
         var tab = app_view_model.application_data.tabs.tabsList().find(function(t) { return t.name() === "pat"; });

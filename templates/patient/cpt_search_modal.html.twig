@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CPT Code Search</title>
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/style_cobalt_blue.css?v=81" />
+    <script src="{{ webroot }}/public/assets/jquery/dist/jquery.min.js?v=81"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; }
+        .modal-container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,.1); }
+        .modal-header { background: #007bff; color: white; padding: 15px 20px; border-radius: 8px 8px 0 0; }
+        .modal-header h3 { margin: 0; font-size: 1.5em; }
+        .modal-body { padding: 20px; }
+        .search-container { margin-bottom: 20px; }
+        .search-input { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; }
+        .search-results { max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px; }
+        .cpt-item { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background-color 0.2s; }
+        .cpt-item:hover { background-color: #f8f9fa; }
+        .cpt-item:last-child { border-bottom: none; }
+        .cpt-code { font-weight: bold; color: #007bff; font-size: 1.1em; }
+        .cpt-description { color: #333; margin-top: 5px; line-height: 1.4; }
+        .no-results { padding: 20px; text-align: center; color: #6c757d; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #dee2e6; text-align: right; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; margin-left: 10px; }
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Search CPT Codes</h3>
+        </div>
+        <div class="modal-body">
+            <div class="search-container">
+                <input type="text" id="cptSearch" class="search-input" placeholder="Search CPT codes by code or description..." autocomplete="off">
+            </div>
+            <div id="searchResults" class="search-results">
+                <!-- Pre-populated with all CPT codes -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.close();">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // CPT codes database
+        const cptCodes = {
+            "93970": "Duplex scan of extremity veins; complete bilateral study",
+            "36561": "Insertion of tunneled centrally inserted central venous catheter, without subcutaneous port or pump; age 5 years or older",
+            "36571": "Repair of tunneled or non-tunneled centrally inserted central venous catheter, without subcutaneous port or pump, any age, including fluoroscopic guidance, when performed",
+            "76937": "Ultrasound guidance for vascular access requiring ultrasound evaluation of potential access sites, documentation of selected vessel patency, concurrent realtime ultrasound visualization of vascular needle entry, with permanent recording and reporting",
+            "99213": "Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of 3 medical decision making components",
+            "A4301": "BARD MIDLINE KIT",
+            "36569": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, without guidance, age 5 years or older",
+            "A4215": "BardPowerPICC + 3CG",
+            "A4216": "BardPowerPICC Solo",
+            "A4217": "BardPowerPICC Solo2",
+            "A4218": "BardPowerPICC Max",
+            "36410": "Venipuncture, age 3 years or older, necessitating the skill of a physician or other qualified health care professional, for diagnostic or therapeutic purposes (specify reason)",
+            "36568": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, without imaging guidance; younger than 5 years",
+            "36572": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, with imaging guidance; younger than 5 years",
+            "36573": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, with imaging guidance; central venous access device insertion",
+            "36584": "Replacement, complete, of a peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, through same venous access",
+            "36585": "Replacement, complete, of a peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, through new venous access",
+            "36589": "Removal of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump"
+        };
+
+        function searchCPTCodes() {
+            const searchTerm = document.getElementById('cptSearch').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsContainer.innerHTML = '<div class="no-results">Enter a search term to find CPT codes</div>';
+                return;
+            }
+
+            const matchingCodes = [];
+            for (const [code, description] of Object.entries(cptCodes)) {
+                if (code.toLowerCase().includes(searchTerm) || description.toLowerCase().includes(searchTerm)) {
+                    matchingCodes.push({ code, description });
+                }
+            }
+
+            if (matchingCodes.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">No CPT codes found matching your search</div>';
+                return;
+            }
+
+            let html = '';
+            matchingCodes.forEach(item => {
+                html += `
+                    <div class="cpt-item" onclick="selectCPTCode('${item.code}', '${item.description.replace(/'/g, "\\'")}')">
+                        <div class="cpt-code">${item.code}</div>
+                        <div class="cpt-description">${item.description}</div>
+                    </div>
+                `;
+            });
+            resultsContainer.innerHTML = html;
+        }
+
+        function selectCPTCode(code, description) {
+            // Send the selected code back to the parent window
+            if (window.opener) {
+                window.opener.setCPTCode(code, description);
+                window.close();
+            } else if (window.parent) {
+                window.parent.setCPTCode(code, description);
+                window.close();
+            } else if (window.top) {
+                window.top.setCPTCode(code, description);
+                window.close();
+            }
+        }
+
+        // Set up search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('cptSearch');
+            searchInput.addEventListener('input', searchCPTCodes);
+            searchInput.focus();
+            
+            // Pre-populate with all CPT codes
+            displayAllCPTCodes();
+        });
+
+        function displayAllCPTCodes() {
+            const resultsContainer = document.getElementById('searchResults');
+            let html = '';
+            
+            // Add Common CPT Codes section first
+            html += '<div style="background: #e9f5ff; padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 4px solid #007bff;">';
+            html += '<h4 style="margin: 0 0 10px 0; color: #007bff;">Common CPT Codes</h4>';
+            html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+            
+            const commonCodes = ['93970', '36561', '36571', '76937', '99213', 'A4301', '36569'];
+            commonCodes.forEach(code => {
+                if (cptCodes[code]) {
+                    html += `<span class="common-cpt-tag" onclick="selectCPTCode('${code}', '${cptCodes[code].replace(/'/g, "\\'")}')" style="background: #007bff; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: background-color 0.2s;">${code}</span>`;
+                }
+            });
+            
+            html += '</div>';
+            html += '</div>';
+            
+            // Add all CPT codes
+            html += '<div style="border-top: 1px solid #dee2e6; padding-top: 15px;">';
+            html += '<h4 style="margin: 0 0 15px 0; color: #333;">All CPT Codes</h4>';
+            
+            for (const [code, description] of Object.entries(cptCodes)) {
+                html += `
+                    <div class="cpt-item" onclick="selectCPTCode('${code}', '${description.replace(/'/g, "\\'")}')">
+                        <div class="cpt-code">${code}</div>
+                        <div class="cpt-description">${description}</div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

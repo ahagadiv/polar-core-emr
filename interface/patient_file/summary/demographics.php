@@ -1,5 +1,8 @@
 <?php
 
+// POLAR_DEMOGRAPHICS_LOADED_V3 - This file is loading
+echo "<!-- POLAR_DEMOGRAPHICS_LOADED_V3 - demographics.php is loading -->";
+
 // Debug: Check if demographics.php is being called
 if ($_POST && isset($_POST['action'])) {
     error_log("Demographics.php called with action: " . $_POST['action']);
@@ -85,6 +88,10 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'save_rapid_respon
     error_log("POST data: " . print_r($_POST, true));
     
     // Always return JSON for this action, regardless of AJAX detection
+    // Clear any previous output
+    if (ob_get_level()) {
+        ob_clean();
+    }
     header('Content-Type: application/json');
     
     // Verify CSRF token
@@ -138,6 +145,10 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'save_rapid_respon
 
 // Handle delete rapid response contact
 if ($_POST && isset($_POST['action']) && $_POST['action'] === 'delete_rapid_response_contact') {
+    // Clear any previous output
+    if (ob_get_level()) {
+        ob_clean();
+    }
     header('Content-Type: application/json');
     
     // Verify CSRF token
@@ -176,6 +187,10 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'delete_rapid_resp
 
 // Handle GET request for contact data
 if (isset($_GET['action']) && $_GET['action'] === 'get_rapid_response_contact') {
+    // Clear any previous output
+    if (ob_get_level()) {
+        ob_clean();
+    }
     header('Content-Type: application/json');
     
     $contactId = $_GET['contact_id'] ?? '';
@@ -219,23 +234,20 @@ if (isset($_GET['set_pid'])) {
         echo "<!-- DEBUG: Forced PID to: $pid -->";
     }
     
-    // Add debug output after PID is set
+    // Debug output (only in HTML comments, not visible)
     echo "<!-- DEBUG: demographics.php script started at " . date('Y-m-d H:i:s') . " -->";
-    echo "<div style='background: red; color: white; padding: 10px; margin: 10px; border: 2px solid black; font-weight: bold;'>";
-    echo "DEMOGRAPHICS.PHP IS LOADING - PID: " . ($pid ?? 'NO PID') . " - TIME: " . date('Y-m-d H:i:s');
-    echo "</div>";
     echo "<!-- DEBUG: Current patient ID: " . ($pid ?? 'NOT SET') . " -->";
     echo "<!-- DEBUG: Session patient ID: " . ($_SESSION['pid'] ?? 'NOT SET') . " -->";
-    echo "<div style='background: yellow; padding: 10px; margin: 10px; border: 2px solid red;'>";
-    echo "<strong>DEBUG: demographics.php is loading at " . date('Y-m-d H:i:s') . "</strong>";
-    echo "</div>";
+    
+    // Define resNotNull - this controls whether certain cards are shown
+    $resNotNull = !empty($pid);
     
     $ptService = new PatientService();
     $newPatient = $ptService->findByPid($pid);
     echo "<!-- DEBUG: newPatient: " . print_r($newPatient, true) . " -->";
     if ($newPatient) {
         try {
-            $ptService->touchRecentPatientList($newPatient);
+    $ptService->touchRecentPatientList($newPatient);
         } catch (Exception $e) {
             // Silently fail if user is not authenticated
             error_log("touchRecentPatientList failed: " . $e->getMessage());
@@ -505,14 +517,65 @@ $vitals_is_registered = $tmp['count'];
 
 // Get patient/employer/insurance information.
 //
+// Enable error reporting to see what's happening
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+echo "<!-- DEBUG: About to call getPatientData for PID: $pid -->";
+error_log("DEBUG: About to call getPatientData for PID: $pid");
+
+// Test database connection first
+$testQuery = sqlQuery("SELECT COUNT(*) as count FROM patient_data WHERE pid = ?", [$pid]);
+echo "<!-- DEBUG: Test query result: " . print_r($testQuery, true) . " -->";
+error_log("DEBUG: Test query result: " . print_r($testQuery, true));
+
+// Test if patient exists
+$patientExists = sqlQuery("SELECT fname, lname FROM patient_data WHERE pid = ?", [$pid]);
+echo "<!-- DEBUG: Patient exists check: " . print_r($patientExists, true) . " -->";
+error_log("DEBUG: Patient exists check: " . print_r($patientExists, true));
+
+// Test getPatientData function with error handling
+echo "<!-- DEBUG: About to call getPatientData function -->";
+error_log("DEBUG: About to call getPatientData function");
+
+try {
 $result = getPatientData($pid, "*, DATE_FORMAT(DOB,'%Y-%m-%d') as DOB_YMD");
+    echo "<!-- DEBUG: getPatientData completed without exception -->";
+    error_log("DEBUG: getPatientData completed without exception");
+} catch (Exception $e) {
+    echo "<!-- DEBUG: getPatientData exception: " . $e->getMessage() . " -->";
+    error_log("DEBUG: getPatientData exception: " . $e->getMessage());
+    $result = false;
+}
+
+// Debug: Check if patient data was fetched
+echo "<!-- DEBUG: Patient data fetched for PID $pid -->";
+echo "<!-- DEBUG: Patient data result: " . print_r($result, true) . " -->";
+echo "<!-- DEBUG: Result type: " . gettype($result) . " -->";
+error_log("DEBUG: Patient data fetched for PID $pid: " . print_r($result, true));
+error_log("DEBUG: Result type: " . gettype($result));
+echo "<!-- DEBUG: Result count: " . (is_array($result) ? count($result) : 'not array') . " -->";
+if (is_array($result) && !empty($result)) {
+    echo "<!-- DEBUG: Patient name: " . ($result['fname'] ?? 'no fname') . " " . ($result['lname'] ?? 'no lname') . " -->";
+    echo "<!-- DEBUG: Patient DOB: " . ($result['DOB'] ?? 'no DOB') . " -->";
+} else {
+    echo "<!-- DEBUG: WARNING - Patient data is empty or not an array! -->";
+    error_log("WARNING: Patient data is empty or not an array for PID $pid");
+}
 echo "<!-- DEBUG: Patient data result: " . print_r($result, true) . " -->";
 error_log("DEBUG: Patient data for $pid: " . print_r($result, true));
 // Add related persons to result array
 $relSvc = new DemographicsRelatedPersonsService(); // defaults to 3 related persons
 $relSvc->mergeIntoResult((int)$pid, $result);
 
+// Debug: Check result after mergeIntoResult
+echo "<!-- DEBUG: Result after mergeIntoResult: " . print_r($result, true) . " -->";
+error_log("DEBUG: Result after mergeIntoResult: " . print_r($result, true));
+
 $result2 = getEmployerData($pid);
+echo "<!-- DEBUG: Result after getEmployerData: " . print_r($result, true) . " -->";
+error_log("DEBUG: Result after getEmployerData: " . print_r($result, true));
+
 $result3 = getInsuranceData(
     $pid,
     "primary",
@@ -521,6 +584,8 @@ $result3 = getInsuranceData(
     DATE_FORMAT(`date`,'%Y-%m-%d') as effdate,
     DATE_FORMAT(`date_end`,'%Y-%m-%d') as effdate_end"
 );
+echo "<!-- DEBUG: Result after getInsuranceData: " . print_r($result, true) . " -->";
+error_log("DEBUG: Result after getInsuranceData: " . print_r($result, true));
 $insco_name = "";
 if (!empty($result3['provider'])) {   // Use provider in case there is an ins record w/ unassigned insco
     $insco_name = getInsuranceProvider($result3['provider']);
@@ -1344,8 +1409,8 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     $priorDate = "";
                     $therapyGroupCategories = [];
                     $query = sqlStatement("SELECT pc_catid FROM openemr_postcalendar_categories WHERE pc_cattype = 3 AND pc_active = 1");
-                    while ($result = sqlFetchArray($query)) {
-                        $therapyGroupCategories[] = $result['pc_catid'];
+                    while ($categoryRow = sqlFetchArray($query)) {
+                        $therapyGroupCategories[] = $categoryRow['pc_catid'];
                     }
 
                     // Build the UI Loop
@@ -1577,6 +1642,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'id' => $id,
                         'initiallyCollapsed' => shouldExpandByDefault($id),
                         'rapid_response_contacts' => $rapid_response_contacts,
+                        'csrf_token' => CsrfUtils::collectCsrfToken(),
                         'prependedInjection' => $dispatchResult->getPrependedInjection(),
                         'appendedInjection' => $dispatchResult->getAppendedInjection(),
                     ]);
@@ -1845,9 +1911,33 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     }
                     
                     echo "<!-- DEBUG: Adding DemographicsViewCard to section -->";
-                    $demographicsCard = new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]);
-                    $sectionRenderEvents->addCard($demographicsCard);
-                    echo "<!-- DEBUG: DemographicsViewCard added successfully -->";
+                    echo "<!-- DEBUG: Patient data before DemographicsViewCard: " . print_r($result, true) . " -->";
+                    echo "<!-- DEBUG: Employer data before DemographicsViewCard: " . print_r($result2, true) . " -->";
+                    echo "<!-- DEBUG: Result is_array: " . (is_array($result) ? 'YES' : 'NO') . " -->";
+                    echo "<!-- DEBUG: Result empty: " . (empty($result) ? 'YES' : 'NO') . " -->";
+                    error_log("DEBUG: Patient data before DemographicsViewCard for PID $pid: " . print_r($result, true));
+                    
+                    // Check if data is valid before creating the card
+                    if (empty($result)) {
+                        echo "<!-- DEBUG: ERROR - Patient data is empty, cannot create DemographicsViewCard -->";
+                        error_log("ERROR: Patient data is empty, cannot create DemographicsViewCard for PID $pid");
+                        error_log("ERROR: Result type: " . gettype($result));
+                    } else {
+                        echo "<!-- DEBUG: Creating DemographicsViewCard with valid data -->";
+                        $demographicsCard = new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]);
+                        echo "<!-- DEBUG: DemographicsViewCard created, adding to section -->";
+                        $sectionRenderEvents->addCard($demographicsCard);
+                        echo "<!-- DEBUG: DemographicsViewCard added to section -->";
+                        echo "<!-- DEBUG: DemographicsViewCard added successfully -->";
+                        
+                        // Debug: Log that the card is being created
+                        echo "<!-- DEBUG: Demographics card created successfully -->";
+                        
+                        // Debug: Check if card is in the section
+                        $cardsAfter = $sectionRenderEvents->getCards();
+                        echo "<!-- DEBUG: Cards after adding DemographicsViewCard: " . count($cardsAfter) . " -->";
+                        error_log("DEBUG: Cards after adding DemographicsViewCard: " . count($cardsAfter));
+                    }
 
                     if (!$GLOBALS['hide_billing_widget']) {
                         $sectionRenderEvents->addCard(new BillingViewCard($pid, $insco_name, $result['billing_note'] ?? '', $result3 ?: [], ['dispatcher' => $ed]));
@@ -1861,6 +1951,12 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     $sectionCards = $sectionRenderEvents->getCards();
                     echo "<!-- DEBUG: Total cards to render: " . count($sectionCards) . " -->";
                     error_log("DEBUG: Total cards to render: " . count($sectionCards));
+                    
+                    // Debug: List all cards
+                    foreach ($sectionCards as $index => $card) {
+                        echo "<!-- DEBUG: Card $index: " . get_class($card) . " -->";
+                        error_log("DEBUG: Card $index: " . get_class($card));
+                    }
 
                     // if anyone wants to render anything before the patient demographic list
                     $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new RenderEvent($pid), RenderEvent::EVENT_SECTION_LIST_RENDER_BEFORE, 10);
@@ -1962,9 +2058,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         $dispatchResult = $ed->dispatch(new CardRenderEvent('amendment'), CardRenderEvent::EVENT_HANDLE);
                         // Amendments widget
                         $sql = "SELECT * FROM amendments WHERE pid = ? ORDER BY amendment_date DESC";
-                        $result = sqlStatement($sql, [$pid]);
+                        $amendmentsQuery = sqlStatement($sql, [$pid]);
                         $amendments = [];
-                        while ($row = sqlFetchArray($result)) {
+                        while ($row = sqlFetchArray($amendmentsQuery)) {
                             $amendments[] = $row;
                         }
 
