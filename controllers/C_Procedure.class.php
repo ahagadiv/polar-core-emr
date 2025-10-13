@@ -15,19 +15,10 @@ require_once(__DIR__ . "/../library/patient.inc.php");
 
 use OpenEMR\Common\Acl\AclMain;
 use OpenEMR\Common\Csrf\CsrfUtils;
+use OpenEMR\Common\Twig\TwigContainer;
 
 class C_Procedure extends Controller
 {
-    public $procedures;
-    public $patient_id;
-
-    public function __construct($template_mod = "general")
-    {
-        parent::__construct();
-        $this->procedures = [];
-        $this->patient_id = null;
-    }
-
     public function list_action()
     {
         $patient_id = $_GET['id'] ?? null;
@@ -36,8 +27,6 @@ class C_Procedure extends Controller
             echo "Error: No patient ID provided";
             return;
         }
-
-        $this->patient_id = $patient_id;
         
         // Check ACL permissions
         if (!AclMain::aclCheckCore('patients', 'proc', '', 'read')) {
@@ -46,10 +35,19 @@ class C_Procedure extends Controller
         }
 
         // Get procedures for this patient
-        $this->getProcedures($patient_id);
+        $procedures = $this->getProcedures($patient_id);
         
-        // Render the procedures list
-        $this->renderProceduresList();
+        // Get patient data
+        $patient_data = $this->getPatientData($patient_id);
+        
+        // Render using Twig template
+        $twig = TwigContainer::getInstance();
+        echo $twig->getTwig()->render('patient/card/patient_procedures.html.twig', [
+            'patient_procedures' => $procedures,
+            'patient' => $patient_data,
+            'pid' => $patient_id,
+            'csrf_token_form' => CsrfUtils::csrfGetToken(),
+        ]);
     }
 
     private function getProcedures($patient_id)
@@ -58,50 +56,19 @@ class C_Procedure extends Controller
         $sql = "SELECT * FROM patient_procedures WHERE patient_id = ? ORDER BY procedure_date DESC";
         $result = sqlStatement($sql, [$patient_id]);
         
-        $this->procedures = [];
+        $procedures = [];
         while ($row = sqlFetchArray($result)) {
-            $this->procedures[] = $row;
+            $procedures[] = $row;
         }
+        
+        return $procedures;
     }
-
-    private function renderProceduresList()
+    
+    private function getPatientData($patient_id)
     {
-        echo "<div class='container-fluid'>";
-        echo "<h3>Patient Procedures</h3>";
-        
-        if (empty($this->procedures)) {
-            echo "<p>No procedures found for this patient.</p>";
-        } else {
-            echo "<table class='table table-striped'>";
-            echo "<thead><tr>";
-            echo "<th>CPT Code</th>";
-            echo "<th>Description</th>";
-            echo "<th>Date</th>";
-            echo "<th>Status</th>";
-            echo "<th>Actions</th>";
-            echo "</tr></thead>";
-            echo "<tbody>";
-            
-            foreach ($this->procedures as $procedure) {
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($procedure['cpt_code']) . "</td>";
-                echo "<td>" . htmlspecialchars($procedure['procedure_description']) . "</td>";
-                echo "<td>" . htmlspecialchars($procedure['procedure_date']) . "</td>";
-                echo "<td>" . htmlspecialchars($procedure['status']) . "</td>";
-                echo "<td>";
-                echo "<a href='#' class='btn btn-sm btn-primary'>Edit</a> ";
-                echo "<a href='#' class='btn btn-sm btn-danger'>Delete</a>";
-                echo "</td>";
-                echo "</tr>";
-            }
-            
-            echo "</tbody></table>";
-        }
-        
-        echo "<div class='mt-3'>";
-        echo "<a href='#' class='btn btn-primary'>Add New Procedure</a>";
-        echo "</div>";
-        
-        echo "</div>";
+        // Get basic patient data
+        $sql = "SELECT fname, lname, pubpid FROM patient_data WHERE pid = ?";
+        $result = sqlQuery($sql, [$patient_id]);
+        return $result ?: [];
     }
 }

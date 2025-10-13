@@ -274,10 +274,20 @@ function encounterList()
 
 function loadCurrentPatient()
 {
-    var url=webroot_url+'/interface/patient_file/summary/demographics.php';
+    var patientId = app_view_model.application_data.patient() ? app_view_model.application_data.patient().pubpid() : null;
+    if (!patientId) {
+        console.log("No patient selected");
+        return;
+    }
+    var url=webroot_url+'/interface/patient_file/summary/demographics.php?set_pid=' + encodeURIComponent(patientId);
     navigateTab(url, "pat", function () {
         activateTabByName("pat",true);
-    });
+        // Update tab title to "Dashboard"
+        var tab = app_view_model.application_data.tabs.tabsList().find(function(t) { return t.name() === "pat"; });
+        if (tab) {
+            tab.title("Dashboard");
+        }
+    }, "Dashboard");
 }
 
 function loadCurrentTherapyGroup() {
