@@ -1818,7 +1818,10 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     echo "<!-- DEBUG: Demographics result data: " . print_r($result, true) . " -->";
                     echo "<!-- DEBUG: Demographics result2 data: " . print_r($result2, true) . " -->";
                     
-                    $sectionRenderEvents->addCard(new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]));
+                    echo "<!-- DEBUG: Adding DemographicsViewCard to section -->";
+                    $demographicsCard = new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]);
+                    $sectionRenderEvents->addCard($demographicsCard);
+                    echo "<!-- DEBUG: DemographicsViewCard added successfully -->";
 
                     if (!$GLOBALS['hide_billing_widget']) {
                         $sectionRenderEvents->addCard(new BillingViewCard($pid, $insco_name, $result['billing_note'] ?? '', $result3 ?: [], ['dispatcher' => $ed]));
@@ -1830,11 +1833,15 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
 
                     // Get the cards to render
                     $sectionCards = $sectionRenderEvents->getCards();
+                    echo "<!-- DEBUG: Total cards to render: " . count($sectionCards) . " -->";
+                    error_log("DEBUG: Total cards to render: " . count($sectionCards));
 
                     // if anyone wants to render anything before the patient demographic list
                     $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new RenderEvent($pid), RenderEvent::EVENT_SECTION_LIST_RENDER_BEFORE, 10);
 
                     foreach ($sectionCards as $card) {
+                        echo "<!-- DEBUG: Rendering card: " . get_class($card) . " -->";
+                        error_log("DEBUG: Rendering card: " . get_class($card));
                         $_auth = $card->getAcl();
                         if (!empty($_auth) && !AclMain::aclCheckCore($_auth[0], $_auth[1])) {
                             continue;
