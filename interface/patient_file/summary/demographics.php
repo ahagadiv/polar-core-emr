@@ -222,6 +222,12 @@ if (isset($_GET['set_pid'])) {
     echo "<!-- DEBUG: PID after setpid: $pid -->";
     echo "<!-- DEBUG: GET set_pid: " . $_GET['set_pid'] . " -->";
     echo "<!-- DEBUG: SESSION pid: " . ($_SESSION['pid'] ?? 'NOT SET') . " -->";
+    
+    // Force set the global $pid variable if it's not set
+    if (!isset($pid) || empty($pid)) {
+        $pid = intval($_GET['set_pid']);
+        echo "<!-- DEBUG: Forced PID to: $pid -->";
+    }
     $ptService = new PatientService();
     $newPatient = $ptService->findByPid($pid);
     echo "<!-- DEBUG: newPatient: " . print_r($newPatient, true) . " -->";
@@ -1539,7 +1545,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'id' => $id,
                         'initiallyCollapsed' => shouldExpandByDefault($id),
                         'btnLabel' => "Manage",
-                        'btnLink' => "{$GLOBALS['webroot']}/controller.php?procedure&list&id=" . $pid,
+                        'btnLink' => "{$GLOBALS['webroot']}/controller.php?procedure&list&id=" . ($pid ?? $_GET['set_pid'] ?? ''),
                         'debug_pid' => $pid,
                         'linkMethod' => "javascript",
                         'btnClass' => "iframe",
