@@ -28,7 +28,7 @@ class C_Procedure extends Controller
         $this->patient_id = null;
     }
 
-    public function list()
+    public function list_action()
     {
         $patient_id = $_GET['id'] ?? null;
         
