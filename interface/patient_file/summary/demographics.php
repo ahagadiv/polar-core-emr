@@ -1815,6 +1815,8 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     // Debug: Log demographics data
                     echo "<!-- DEBUG: Demographics data for patient $pid -->";
                     error_log("DEBUG: Demographics data for patient $pid: " . print_r($result, true));
+                    echo "<!-- DEBUG: Demographics result data: " . print_r($result, true) . " -->";
+                    echo "<!-- DEBUG: Demographics result2 data: " . print_r($result2, true) . " -->";
                     
                     $sectionRenderEvents->addCard(new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]));
 
