@@ -477,6 +477,8 @@ $vitals_is_registered = $tmp['count'];
 // Get patient/employer/insurance information.
 //
 $result = getPatientData($pid, "*, DATE_FORMAT(DOB,'%Y-%m-%d') as DOB_YMD");
+echo "<!-- DEBUG: Patient data result: " . print_r($result, true) . " -->";
+error_log("DEBUG: Patient data for $pid: " . print_r($result, true));
 // Add related persons to result array
 $relSvc = new DemographicsRelatedPersonsService(); // defaults to 3 related persons
 $relSvc->mergeIntoResult((int)$pid, $result);
