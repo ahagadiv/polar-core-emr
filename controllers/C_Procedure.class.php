@@ -46,6 +46,8 @@ class C_Procedure extends Controller
             'patient_procedures' => $procedures,
             'patient' => $patient_data,
             'pid' => $patient_id,
+            'btnLink' => $GLOBALS['webroot'] . '/controller.php?procedure&add&id=' . $patient_id,
+            'btnLabel' => 'Add New Procedure',
             'csrf_token_form' => CsrfUtils::collectCsrfToken(),
         ]);
     }

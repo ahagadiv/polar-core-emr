@@ -220,6 +220,8 @@ if (isset($_GET['set_pid'])) {
     require_once("$srcdir/pid.inc.php");
     setpid($_GET['set_pid']);
     echo "<!-- DEBUG: PID after setpid: $pid -->";
+    echo "<!-- DEBUG: GET set_pid: " . $_GET['set_pid'] . " -->";
+    echo "<!-- DEBUG: SESSION pid: " . ($_SESSION['pid'] ?? 'NOT SET') . " -->";
     $ptService = new PatientService();
     $newPatient = $ptService->findByPid($pid);
     echo "<!-- DEBUG: newPatient: " . print_r($newPatient, true) . " -->";
@@ -1538,6 +1540,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'initiallyCollapsed' => shouldExpandByDefault($id),
                         'btnLabel' => "Manage",
                         'btnLink' => "{$GLOBALS['webroot']}/controller.php?procedure&list&id=" . $pid,
+                        'debug_pid' => $pid,
                         'linkMethod' => "javascript",
                         'btnClass' => "iframe",
                         'auth' => AclMain::aclCheckCore('patients', 'proc', '', ['write', 'addonly']),

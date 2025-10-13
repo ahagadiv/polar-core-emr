@@ -4,6 +4,8 @@
 <div class="text ml-2">
     <!-- DEBUG: patient_procedures defined: {{ patient_procedures is defined ? 'YES' : 'NO' }} -->
     <!-- DEBUG: patient_procedures count: {{ patient_procedures|length }} -->
+    <!-- DEBUG: debug_pid: {{ debug_pid ?? 'NOT SET' }} -->
+    <!-- DEBUG: btnLink: {{ btnLink ?? 'NOT SET' }} -->
     {% if patient_procedures is defined and patient_procedures is not empty %}
         <div class="procedures-list">
             {% for procedure in patient_procedures %}
