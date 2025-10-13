@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Procedures - Patient ID: {{ pid }}</title>
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/style_cobalt_blue.css?v=81" />
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/tabs_style_compact.css?v=81" />
+    <script src="{{ webroot }}/public/assets/jquery/dist/jquery.min.js?v=81"></script>
+    <script src="{{ webroot }}/public/assets/bootstrap/dist/js/bootstrap.bundle.min.js?v=81"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f0f2f5; }
+        .procedures-container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+        .procedures-header { border-bottom: 2px solid #007bff; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .procedures-header h2 { margin: 0; font-size: 2em; color: #333; font-weight: 600; }
+        .patient-info { font-size: 1.2em; color: #555; background: #f8f9fa; padding: 10px 15px; border-radius: 5px; }
+        .procedure-list-section { margin-top: 20px; }
+        .add-procedure-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .add-procedure-btn:hover {
+            background-color: #218838;
+            color: white;
+            text-decoration: none;
+        }
+        .procedure-item {
+            background: #fdfdfd;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,.05);
+            transition: box-shadow 0.3s ease;
+        }
+        .procedure-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,.1);
+        }
+        .procedure-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .procedure-code {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.1em;
+        }
+        .procedure-date {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .procedure-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-completed {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .procedure-description {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .procedure-actions {
+            margin-top: 15px;
+            text-align: right;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .procedure-actions a {
+            margin-left: 10px;
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.2s ease;
+        }
+        .procedure-actions a:hover {
+            background-color: #e9ecef;
+            text-decoration: none;
+        }
+        .procedure-actions a.edit {
+            color: #28a745;
+        }
+        .procedure-actions a.delete {
+            color: #dc3545;
+        }
+        .no-procedures {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        .no-procedures h3 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        .stats-bar {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .stat-item {
+            flex: 1;
+        }
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="procedures-container">
+        <div class="procedures-header">
+            <h2>Procedures - Patient ID: {{ pid }}</h2>
+            <div class="patient-info">
+                <strong>Patient:</strong> {{ patient.fname }} {{ patient.lname }} ({{ patient.pubpid }})
+            </div>
+        </div>
+        
+        {% if patient_procedures and patient_procedures|length > 0 %}
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number">{{ patient_procedures|length }}</div>
+                    <div class="stat-label">Total Procedures</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ patient_procedures|filter(p => p.status == 'ACTIVE')|length }}</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ patient_procedures|filter(p => p.status == 'COMPLETED')|length }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="procedure-list-section">
+            <div style="margin-bottom: 20px; text-align: right;">
+                <a href="{{ webroot }}/controller.php?procedure&add&id={{ pid }}" class="add-procedure-btn">+ Add New Procedure</a>
+            </div>
+
+            {% if patient_procedures and patient_procedures|length > 0 %}
+                {% for procedure in patient_procedures %}
+                    <div class="procedure-item">
+                        <div class="procedure-item-header">
+                            <div>
+                                <div class="procedure-code">{{ procedure.procedure_code|default(procedure.cpt_code) }}</div>
+                                <div class="procedure-date">{{ procedure.procedure_date|default(procedure.date)|date('M d, Y H:i') }}</div>
+                            </div>
+                            <div class="procedure-status status-{{ (procedure.status|default('ACTIVE'))|lower }}">{{ procedure.status|default('ACTIVE') }}</div>
+                        </div>
+                        <div class="procedure-description">
+                            {{ procedure.procedure_description|default(procedure.description) }}
+                        </div>
+                        <div class="procedure-actions">
+                            <a href="{{ webroot }}/controller.php?procedure&edit&id={{ pid }}&proc_id={{ procedure.id }}" class="edit">✏️ Edit</a>
+                            <a href="{{ webroot }}/controller.php?procedure&delete&id={{ pid }}&proc_id={{ procedure.id }}" class="delete" onclick="return confirm('Are you sure you want to delete this procedure?');">🗑️ Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-procedures">
+                    <h3>No Procedures Recorded</h3>
+                    <p>No procedures have been recorded for this patient yet.</p>
+                    <p>Click "Add New Procedure" to get started.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

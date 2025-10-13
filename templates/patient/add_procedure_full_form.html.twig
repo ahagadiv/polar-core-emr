@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Procedure - Patient ID: {{ pid }}</title>
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/style_cobalt_blue.css?v=81" />
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/tabs_style_compact.css?v=81" />
+    <script src="{{ webroot }}/public/assets/jquery/dist/jquery.min.js?v=81"></script>
+    <script src="{{ webroot }}/public/assets/bootstrap/dist/js/bootstrap.bundle.min.js?v=81"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f0f2f5; }
+        .form-container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+        .form-header { border-bottom: 1px solid #dee2e6; padding-bottom: 15px; margin-bottom: 25px; }
+        .form-header h2 { margin: 0; font-size: 1.8em; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { font-weight: bold; color: #555; display: block; margin-bottom: 8px; }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+        .input-group {
+            display: flex;
+            width: 100%;
+        }
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .input-group .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: 0;
+        }
+        .common-cpt-codes {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .common-cpt-codes h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .common-cpt-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .common-cpt-item {
+            background-color: #e9f5ff;
+            color: #0056b3;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 1px solid #b3d9ff;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .common-cpt-item:hover {
+            background-color: #d0e9ff;
+            border-color: #80bdff;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>Add New Procedure for Patient ID: {{ pid }}</h2>
+        </div>
+        <form id="addProcedureForm" action="{{ webroot }}/controller.php?procedure&save&id={{ pid }}" method="POST">
+            <input type="hidden" name="csrf_token_form" value="{{ csrf_token_form }}">
+            <input type="hidden" name="pid" value="{{ pid }}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="procedureDate" class="form-label">Procedure Date:</label>
+                    <input type="datetime-local" id="procedureDate" name="date" class="form-control" value="{{ "now"|date("Y-m-d\\TH:i") }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="status" class="form-label">Status:</label>
+                    <select id="status" name="status" class="form-control" required>
+                        <option value="ACTIVE" selected>Active</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cptCode" class="form-label">CPT Code:</label>
+                <div class="input-group">
+                    <input type="text" id="cptCode" name="cpt_code" class="form-control" placeholder="e.g., 36569, A4215, 76937" required onchange="lookupCPTCode()">
+                    <button type="button" class="btn btn-outline-primary" onclick="searchCPTCodes()">Search CPT</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">Procedure Description:</label>
+                <textarea id="description" name="description" class="form-control" rows="5" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="notes" class="form-label">Notes:</label>
+                <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="common-cpt-codes">
+                <h4>Common CPT Codes:</h4>
+                <div class="common-cpt-list">
+                    <span class="common-cpt-item" data-code="93970" data-desc="Duplex scan of extremity veins; complete bilateral study">93970</span>
+                    <span class="common-cpt-item" data-code="36561" data-desc="Insertion of tunneled centrally inserted central venous catheter, without subcutaneous port or pump; age 5 years or older">36561</span>
+                    <span class="common-cpt-item" data-code="36571" data-desc="Repair of tunneled or non-tunneled centrally inserted central venous catheter, without subcutaneous port or pump, any age, including fluoroscopic guidance, when performed">36571</span>
+                    <span class="common-cpt-item" data-code="76937" data-desc="Ultrasound guidance for vascular access requiring ultrasound evaluation of potential access sites, documentation of selected vessel patency, concurrent realtime ultrasound visualization of vascular needle entry, with permanent recording and reporting">76937</span>
+                    <span class="common-cpt-item" data-code="99213" data-desc="Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of 3 medical decision making components">99213</span>
+                    <span class="common-cpt-item" data-code="A4301" data-desc="BARD MIDLINE KIT">A4301</span>
+                    <span class="common-cpt-item" data-code="36569" data-desc="Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, without guidance, age 5 years or older">36569</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: right;">
+                <button type="submit" class="btn-submit">Add Procedure</button>
+                <button type="button" class="btn-cancel" onclick="history.back()">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('procedureDate').valueAsDate = new Date();
+        
+        // Common CPT codes data
+        const commonCptCodes = {
+            "93970": "Duplex scan of extremity veins; complete bilateral study",
+            "36561": "Insertion of tunneled centrally inserted central venous catheter, without subcutaneous port or pump; age 5 years or older",
+            "36571": "Repair of tunneled or non-tunneled centrally inserted central venous catheter, without subcutaneous port or pump, any age, including fluoroscopic guidance, when performed",
+            "76937": "Ultrasound guidance for vascular access requiring ultrasound evaluation of potential access sites, documentation of selected vessel patency, concurrent realtime ultrasound visualization of vascular needle entry, with permanent recording and reporting",
+            "99213": "Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of 3 medical decision making components",
+            "A4301": "BARD MIDLINE KIT",
+            "36569": "Insertion of peripherally inserted central venous catheter (PICC), without subcutaneous port or pump, without guidance, age 5 years or older"
+        };
+
+        // Handle click on common CPT codes
+        document.querySelectorAll('.common-cpt-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const code = this.dataset.code;
+                const desc = this.dataset.desc;
+                document.getElementById('cptCode').value = code;
+                document.getElementById('description').value = desc;
+            });
+        });
+
+        // CPT Code lookup function
+        function lookupCPTCode() {
+            const code = document.getElementById('cptCode').value.trim();
+            if (code && commonCptCodes[code]) {
+                document.getElementById('description').value = commonCptCodes[code];
+            }
+        }
+
+        // Search CPT Codes function
+        function searchCPTCodes() {
+            console.log('Search CPT button clicked');
+            
+            // Use OpenEMR's standard code selection approach
+            var url = '{{ webroot }}/interface/patient_file/encounter/find_code_dynamic.php?codetype=CPT4&singleCodeSelection=1';
+            var title = 'Select CPT Procedure Code';
+            var width = 985;
+            var height = 750;
+            
+            // Set up callback functions
+            window.setCPTCode = setCPTCode;
+            window.set_related = set_related;
+            window.set_related_target = set_related_target;
+            
+            if (typeof top !== 'undefined') {
+                top.setCPTCode = setCPTCode;
+                top.set_related = set_related;
+                top.set_related_target = set_related_target;
+            }
+            
+            if (typeof parent !== 'undefined') {
+                parent.setCPTCode = setCPTCode;
+                parent.set_related = set_related;
+                parent.set_related_target = set_related_target;
+            }
+            
+            if (window.opener) {
+                window.opener.setCPTCode = setCPTCode;
+                window.opener.set_related = set_related;
+                window.opener.set_related_target = set_related_target;
+            }
+            
+            // Open the CPT search dialog
+            if (typeof dlgopen !== 'undefined') {
+                dlgopen(url, '_blank', width, height, '', title, {
+                    resolvePromiseOn: 'close'
+                });
+            } else {
+                // Fallback to window.open
+                window.open(url, '_blank', 'width=' + width + ',height=' + height + ',scrollbars=yes,resizable=yes');
+            }
+        }
+        
+        // Function to handle CPT code selection from dialog
+        function setCPTCode(code, description) {
+            console.log('Setting CPT code:', code, description);
+            try {
+                setTimeout(function() {
+                    var codeField = document.getElementById('cptCode');
+                    var descField = document.getElementById('description');
+                    
+                    if (codeField) {
+                        codeField.value = code;
+                        codeField.style.backgroundColor = '#d4edda';
+                        setTimeout(function() {
+                            codeField.style.backgroundColor = '';
+                        }, 1000);
+                        codeField.dispatchEvent(new Event('change'));
+                    }
+                    
+                    if (descField) {
+                        descField.value = description;
+                        descField.style.backgroundColor = '#d4edda';
+                        setTimeout(function() {
+                            descField.style.backgroundColor = '';
+                        }, 1000);
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error setting CPT code:', error);
+            }
+        }
+        
+        // Placeholder functions for compatibility
+        function set_related() {}
+        function set_related_target() {}
+        
+        // Form submission
+        document.getElementById('addProcedureForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // For now, show success message
+            alert('Procedure saved successfully! (This is a demo - actual saving will be implemented)');
+            history.back();
+        });
+    </script>
+</body>
+</html>

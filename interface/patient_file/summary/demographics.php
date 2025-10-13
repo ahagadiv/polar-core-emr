@@ -1834,6 +1834,16 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     echo "<!-- DEBUG: Demographics result data: " . print_r($result, true) . " -->";
                     echo "<!-- DEBUG: Demographics result2 data: " . print_r($result2, true) . " -->";
                     
+                    // Check if data is empty
+                    if (empty($result)) {
+                        echo "<!-- DEBUG: WARNING - Patient data is empty! -->";
+                        error_log("WARNING: Patient data is empty for PID $pid");
+                    }
+                    if (empty($result2)) {
+                        echo "<!-- DEBUG: WARNING - Employer data is empty! -->";
+                        error_log("WARNING: Employer data is empty for PID $pid");
+                    }
+                    
                     echo "<!-- DEBUG: Adding DemographicsViewCard to section -->";
                     $demographicsCard = new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]);
                     $sectionRenderEvents->addCard($demographicsCard);
