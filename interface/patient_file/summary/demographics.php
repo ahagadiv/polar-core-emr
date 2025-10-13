@@ -1489,6 +1489,8 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 
                 // 2. PROCEDURES CARD (top-middle)
                 echo "<!-- DEBUG: Reaching procedures card section for patient $pid -->";
+                echo "<!-- DEBUG: PID value: $pid -->";
+                echo "<!-- DEBUG: resNotNull value: " . ($resNotNull ? 'true' : 'false') . " -->";
                 error_log("DEBUG: Reaching procedures card section for patient $pid");
                 error_log("DEBUG: ACL Check for procedures - readonly: " . (AclMain::aclCheckCore('patients', 'proc', '', 'readonly') ? 'YES' : 'NO') . 
                          ", write: " . (AclMain::aclCheckCore('patients', 'proc', '', 'write') ? 'YES' : 'NO') . 
@@ -1528,6 +1530,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     ]);
                     echo "</td>";
                 }
+                echo "<!-- DEBUG: Procedures card section completed -->";
                 
                 // 3. RAPID RESPONSE CONTACT CARD (top-right)
                 if ($resNotNull) {
