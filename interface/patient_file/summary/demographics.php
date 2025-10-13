@@ -211,9 +211,15 @@ $twig = new TwigContainer(null, $GLOBALS['kernel']);
 if (isset($_GET['set_pid'])) {
     require_once("$srcdir/pid.inc.php");
     setpid($_GET['set_pid']);
+    echo "<!-- DEBUG: PID after setpid: $pid -->";
     $ptService = new PatientService();
     $newPatient = $ptService->findByPid($pid);
+    echo "<!-- DEBUG: newPatient: " . print_r($newPatient, true) . " -->";
+    if ($newPatient) {
     $ptService->touchRecentPatientList($newPatient);
+    } else {
+        echo "<!-- DEBUG: newPatient is null, skipping touchRecentPatientList -->";
+    }
     if (isset($_GET['set_encounterid']) && ((int)$_GET['set_encounterid'] > 0)) {
         $encounter = (int)$_GET['set_encounterid'];
         SessionUtil::setSession('encounter', $encounter);
