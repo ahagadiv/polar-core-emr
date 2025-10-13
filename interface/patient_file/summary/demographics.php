@@ -1,15 +1,5 @@
 <?php
 
-echo "<!-- DEBUG: demographics.php script started at " . date('Y-m-d H:i:s') . " -->";
-echo "<div style='background: red; color: white; padding: 10px; margin: 10px; border: 2px solid black; font-weight: bold;'>";
-echo "DEMOGRAPHICS.PHP IS LOADING - PID: " . ($pid ?? 'NO PID') . " - TIME: " . date('Y-m-d H:i:s');
-echo "</div>";
-echo "<!-- DEBUG: Current patient ID: " . ($pid ?? 'NOT SET') . " -->";
-echo "<!-- DEBUG: Session patient ID: " . ($_SESSION['pid'] ?? 'NOT SET') . " -->";
-echo "<div style='background: yellow; padding: 10px; margin: 10px; border: 2px solid red;'>";
-echo "<strong>DEBUG: demographics.php is loading at " . date('Y-m-d H:i:s') . "</strong>";
-echo "</div>";
-
 // Debug: Check if demographics.php is being called
 if ($_POST && isset($_POST['action'])) {
     error_log("Demographics.php called with action: " . $_POST['action']);
@@ -228,6 +218,18 @@ if (isset($_GET['set_pid'])) {
         $pid = intval($_GET['set_pid']);
         echo "<!-- DEBUG: Forced PID to: $pid -->";
     }
+    
+    // Add debug output after PID is set
+    echo "<!-- DEBUG: demographics.php script started at " . date('Y-m-d H:i:s') . " -->";
+    echo "<div style='background: red; color: white; padding: 10px; margin: 10px; border: 2px solid black; font-weight: bold;'>";
+    echo "DEMOGRAPHICS.PHP IS LOADING - PID: " . ($pid ?? 'NO PID') . " - TIME: " . date('Y-m-d H:i:s');
+    echo "</div>";
+    echo "<!-- DEBUG: Current patient ID: " . ($pid ?? 'NOT SET') . " -->";
+    echo "<!-- DEBUG: Session patient ID: " . ($_SESSION['pid'] ?? 'NOT SET') . " -->";
+    echo "<div style='background: yellow; padding: 10px; margin: 10px; border: 2px solid red;'>";
+    echo "<strong>DEBUG: demographics.php is loading at " . date('Y-m-d H:i:s') . "</strong>";
+    echo "</div>";
+    
     $ptService = new PatientService();
     $newPatient = $ptService->findByPid($pid);
     echo "<!-- DEBUG: newPatient: " . print_r($newPatient, true) . " -->";

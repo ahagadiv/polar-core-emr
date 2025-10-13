@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Procedures - Patient ID: {{ pid }}</title>
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/style_cobalt_blue.css?v=81" />
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/tabs_style_compact.css?v=81" />
+    <script src="{{ webroot }}/public/assets/jquery/dist/jquery.min.js?v=81"></script>
+    <script src="{{ webroot }}/public/assets/bootstrap/dist/js/bootstrap.bundle.min.js?v=81"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .procedures-container { max-width: 1200px; margin: 0 auto; }
+        .procedures-header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .procedures-list { background: white; border: 1px solid #dee2e6; border-radius: 8px; }
+        .procedure-item { padding: 15px; border-bottom: 1px solid #dee2e6; }
+        .procedure-item:last-child { border-bottom: none; }
+        .procedure-code { font-weight: bold; color: #007bff; }
+        .procedure-date { color: #6c757d; font-size: 0.9em; }
+        .procedure-description { margin-top: 5px; }
+        .procedure-status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .status-active { background: #d4edda; color: #155724; }
+        .add-procedure-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 20px 0; }
+        .add-procedure-btn:hover { background: #0056b3; }
+        .no-procedures { text-align: center; padding: 40px; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="procedures-container">
+        <div class="procedures-header">
+            <h2>Procedures - Patient ID: {{ pid }}</h2>
+            {% if patient %}
+                <p><strong>Patient:</strong> {{ patient.fname }} {{ patient.lname }} ({{ patient.pubpid }})</p>
+            {% endif %}
+        </div>
+        
+        <div class="procedures-list">
+            {% if patient_procedures and patient_procedures|length > 0 %}
+                {% for procedure in patient_procedures %}
+                    <div class="procedure-item">
+                        <div class="procedure-code">{{ procedure.procedure_code }}</div>
+                        <div class="procedure-date">{{ procedure.procedure_date }}</div>
+                        <div class="procedure-description">{{ procedure.procedure_description }}</div>
+                        <div class="procedure-status status-active">{{ procedure.status|default('ACTIVE') }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-procedures">
+                    <p>No procedures recorded for this patient.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <a href="{{ webroot }}/controller.php?procedure&add&id={{ pid }}" class="add-procedure-btn" style="text-decoration: none; display: inline-block;">Add New Procedure</a>
+    </div>
+</body>
+</html>

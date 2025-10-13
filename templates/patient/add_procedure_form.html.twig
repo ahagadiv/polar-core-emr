@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Procedure - Patient ID: {{ pid }}</title>
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/style_cobalt_blue.css?v=81" />
+    <link rel="stylesheet" href="{{ webroot }}/public/themes/tabs_style_compact.css?v=81" />
+    <script src="{{ webroot }}/public/assets/jquery/dist/jquery.min.js?v=81"></script>
+    <script src="{{ webroot }}/public/assets/bootstrap/dist/js/bootstrap.bundle.min.js?v=81"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-container { max-width: 800px; margin: 0 auto; }
+        .form-header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-section { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { font-weight: bold; margin-bottom: 5px; display: block; }
+        .form-control { width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; }
+        .form-control:focus { border-color: #007bff; outline: none; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn:hover { opacity: 0.8; }
+        .required { color: red; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>Add New Procedure</h2>
+            {% if patient %}
+                <p><strong>Patient:</strong> {{ patient.fname }} {{ patient.lname }} ({{ patient.pubpid }})</p>
+            {% endif %}
+        </div>
+        
+        <div class="form-section">
+            <form id="addProcedureForm" method="POST" action="{{ webroot }}/controller.php?procedure&save&id={{ pid }}">
+                <input type="hidden" name="csrf_token_form" value="{{ csrf_token_form }}">
+                <input type="hidden" name="patient_id" value="{{ pid }}">
+                
+                <div class="form-group">
+                    <label class="form-label" for="procedure_code">Procedure Code <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="procedure_code" name="procedure_code" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="procedure_date">Procedure Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="procedure_date" name="procedure_date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="procedure_description">Procedure Description <span class="required">*</span></label>
+                    <textarea class="form-control" id="procedure_description" name="procedure_description" rows="4" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="status">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="ACTIVE" selected>Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="PENDING">Pending</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="notes">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Procedure</button>
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Set today's date as default
+        document.getElementById('procedure_date').valueAsDate = new Date();
+        
+        // Form submission
+        document.getElementById('addProcedureForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // For now, show success message
+            alert('Procedure saved successfully! (This is a demo - actual saving will be implemented)');
+            history.back();
+        });
+    </script>
+</body>
+</html>

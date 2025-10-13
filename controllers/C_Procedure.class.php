@@ -40,15 +40,13 @@ class C_Procedure extends Controller
         // Get patient data
         $patient_data = $this->getPatientData($patient_id);
         
-        // Set the page title
-        echo "<script>document.title = 'Procedures - Patient ID: $patient_id';</script>";
-        
         // Render using Twig template
         $twig = new TwigContainer(null, $GLOBALS['kernel']);
-        echo $twig->getTwig()->render('patient/card/patient_procedures.html.twig', [
+        echo $twig->getTwig()->render('patient/procedures_page.html.twig', [
             'patient_procedures' => $procedures,
             'patient' => $patient_data,
             'pid' => $patient_id,
+            'webroot' => $GLOBALS['webroot'],
             'btnLink' => $GLOBALS['webroot'] . '/controller.php?procedure&add&id=' . $patient_id,
             'btnLabel' => 'Add New Procedure',
             'csrf_token_form' => CsrfUtils::collectCsrfToken(),
@@ -92,9 +90,16 @@ class C_Procedure extends Controller
             return;
         }
         
-        // For now, redirect to a simple add form
-        echo "<h3>Add New Procedure for Patient ID: $patient_id</h3>";
-        echo "<p>This is a placeholder for the add procedure form.</p>";
-        echo "<p><a href='javascript:history.back()'>Go Back</a></p>";
+        // Get patient data
+        $patient_data = $this->getPatientData($patient_id);
+        
+        // Render add procedure form
+        $twig = new TwigContainer(null, $GLOBALS['kernel']);
+        echo $twig->getTwig()->render('patient/add_procedure_form.html.twig', [
+            'patient' => $patient_data,
+            'pid' => $patient_id,
+            'webroot' => $GLOBALS['webroot'],
+            'csrf_token_form' => CsrfUtils::collectCsrfToken(),
+        ]);
     }
 }
