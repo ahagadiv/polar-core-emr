@@ -46,7 +46,7 @@ class C_Procedure extends Controller
             'patient_procedures' => $procedures,
             'patient' => $patient_data,
             'pid' => $patient_id,
-            'csrf_token_form' => CsrfUtils::csrfGetToken(),
+            'csrf_token_form' => 'temp_token',
         ]);
     }
 
