@@ -1532,7 +1532,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         'id' => $id,
                         'initiallyCollapsed' => shouldExpandByDefault($id),
                         'btnLabel' => "Manage",
-                        'btnLink' => "editScripts('{$GLOBALS['webroot']}/controller.php?procedure&list&id=" . attr_url($pid) . "')",
+                        'btnLink' => "{$GLOBALS['webroot']}/controller.php?procedure&list&id=" . $pid,
                         'linkMethod' => "javascript",
                         'btnClass' => "iframe",
                         'auth' => AclMain::aclCheckCore('patients', 'proc', '', ['write', 'addonly']),
