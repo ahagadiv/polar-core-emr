@@ -241,3 +241,4 @@ class PolarClinicalWorkflow
         return ['valid' => true];
     }
 }
+

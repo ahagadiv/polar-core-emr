@@ -1483,6 +1483,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 }
                 
                 // 2. PROCEDURES CARD (top-middle)
+                echo "<!-- DEBUG: Reaching procedures card section for patient $pid -->";
                 error_log("DEBUG: Reaching procedures card section for patient $pid");
                 error_log("DEBUG: ACL Check for procedures - readonly: " . (AclMain::aclCheckCore('patients', 'proc', '', 'readonly') ? 'YES' : 'NO') . 
                          ", write: " . (AclMain::aclCheckCore('patients', 'proc', '', 'write') ? 'YES' : 'NO') . 
@@ -1490,6 +1491,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                 
                 // Temporarily bypass ACL check for debugging
                 if (true) { // AclMain::aclCheckCore('patients', 'proc', '', 'readonly') || AclMain::aclCheckCore('patients', 'proc', '', 'write') || AclMain::aclCheckCore('patients', 'proc', '', 'addonly')) {
+                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     // Fetch patient procedures data
                     $procedures_query = "SELECT * FROM patient_procedures WHERE patient_id = ? AND status IN ('ACTIVE', 'COMPLETED') ORDER BY procedure_date DESC LIMIT 5";
                     $procedures_result = sqlStatement($procedures_query, [$pid]);
@@ -1506,7 +1508,6 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     
                     $id = "procedures_ps_expand";
                     $dispatchResult = $ed->dispatch(new CardRenderEvent('procedures'), CardRenderEvent::EVENT_HANDLE);
-                    echo "<td width=\"33.33%\" valign=\"top\" style=\"padding: 5px;\">";
                     echo $twig->getTwig()->render('patient/card/patient_procedures.html.twig', [
                         'title' => xl("Procedures"),
                         'id' => $id,
@@ -1792,6 +1793,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                     $sectionRenderEvents = $ed->dispatch(new SectionEvent('primary'), SectionEvent::EVENT_HANDLE);
                     
                     // Debug: Log demographics data
+                    echo "<!-- DEBUG: Demographics data for patient $pid -->";
                     error_log("DEBUG: Demographics data for patient $pid: " . print_r($result, true));
                     
                     $sectionRenderEvents->addCard(new DemographicsViewCard($result, $result2, ['dispatcher' => $ed]));
