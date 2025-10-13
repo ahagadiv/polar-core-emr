@@ -274,7 +274,7 @@ function encounterList()
 
 function loadCurrentPatient()
 {
-    var patientId = app_view_model.application_data.patient() ? app_view_model.application_data.patient().pubpid() : null;
+    var patientId = app_view_model.application_data.patient() ? app_view_model.application_data.patient().pid() : null;
     if (!patientId) {
         // Try to get patient ID from URL parameters or session
         var urlParams = new URLSearchParams(window.location.search);
