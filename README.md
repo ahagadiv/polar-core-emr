@@ -126,7 +126,7 @@ Alejandro M. Hagad IV, RN, VA-BC, CCRN, CHN, CVRN — Founder & Principal Archit
 
 Jean Patrick “JP” Sato, RN — Clinical Systems & Alternate RN Administrator
 
-Lizbeth Espiritu — Administrative Operations & Compliance
+Arianne Apple P. Hagad — Administrative Operations & Compliance
 
 We welcome healthcare technologists and open-source contributors.
 [Contribute]
