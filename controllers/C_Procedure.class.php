@@ -28,11 +28,9 @@ class C_Procedure extends Controller
         $this->patient_id = null;
     }
 
-    public function list($patient_id = null)
+    public function list()
     {
-        if (!$patient_id) {
-            $patient_id = $_GET['id'] ?? null;
-        }
+        $patient_id = $_GET['id'] ?? null;
         
         if (!$patient_id) {
             echo "Error: No patient ID provided";

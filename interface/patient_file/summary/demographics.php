@@ -1,6 +1,8 @@
 <?php
 
 echo "<!-- DEBUG: demographics.php script started at " . date('Y-m-d H:i:s') . " -->";
+echo "<!-- DEBUG: Current patient ID: " . ($pid ?? 'NOT SET') . " -->";
+echo "<!-- DEBUG: Session patient ID: " . ($_SESSION['pid'] ?? 'NOT SET') . " -->";
 echo "<div style='background: yellow; padding: 10px; margin: 10px; border: 2px solid red;'>";
 echo "<strong>DEBUG: demographics.php is loading at " . date('Y-m-d H:i:s') . "</strong>";
 echo "</div>";
