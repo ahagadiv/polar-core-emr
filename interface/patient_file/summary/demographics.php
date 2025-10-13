@@ -1,6 +1,9 @@
 <?php
 
-echo "<!-- DEBUG: demographics.php script started -->";
+echo "<!-- DEBUG: demographics.php script started at " . date('Y-m-d H:i:s') . " -->";
+echo "<div style='background: yellow; padding: 10px; margin: 10px; border: 2px solid red;'>";
+echo "<strong>DEBUG: demographics.php is loading at " . date('Y-m-d H:i:s') . "</strong>";
+echo "</div>";
 
 // Debug: Check if demographics.php is being called
 if ($_POST && isset($_POST['action'])) {
