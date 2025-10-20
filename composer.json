@@ -100,7 +100,7 @@
         "symfony/finder": "6.4.24",
         "symfony/filesystem": "6.4.24",
         "symfony/http-client": "6.4.25",
-        "symfony/http-foundation": "6.4.25",
+        "symfony/http-foundation": "6.4.26",
         "symfony/psr-http-message-bridge": "6.4.24",
         "symfony/yaml": "6.4.25",
         "twig/twig": "3.21.1",
