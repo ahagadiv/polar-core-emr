@@ -7,46 +7,376 @@
         <link rel="stylesheet" href="[-php-]echo $GLOBALS['webroot'].'/interface/themes/ajax_calendar_ie.css';[-/php-]">
 <![endif]-->
 <!-- POLAR Healthcare Calendar Styles -->
-<link rel="stylesheet" href="[-php-]echo $GLOBALS['webroot'].'/interface/main/calendar/polar_stat_styles.css';[-/php-]">
-[-php-]
-    // note these scripts have been filtered to be in the same origin as the current site in pnadmin.php & pnuserapi.php
-    if (!empty($this->_tpl_vars['HEADER_SCRIPTS'])) {
-        echo "<!-- Module Scripts Started -->";
-        foreach ($this->_tpl_vars['HEADER_SCRIPTS'] as $script)
-        {
-            echo "<script src='$script' type='text/javascript'></script>";
-        }
-        echo "<!-- Module Scripts Ended -->";
-    }
-
-    if (!empty($this->_tpl_vars['HEADER_STYLES'])) {
-        echo "<!-- Module Styles Started -->";
-        foreach ($this->_tpl_vars['HEADER_STYLES'] as $cssSrc)
-        {
-        echo "<link rel='stylesheet' href='$cssSrc' type='text/css' />";
-        }
-        echo "<!-- Module Styles Ended -->";
-    }
-[-/php-]
-<!-- the javascript used for the ajax_* style calendars -->
-<script src="[-php-] echo $GLOBALS['webroot'] [-/php-]/library/js/calendarDirectSelect.js"></script>
-<script>
-    function event_time_click(elem) {
-        EditEvent($(elem).parents("div.event_appointment").get(0));
-    }
-</script>
-[-php-]
-/**
- * @param string $displayString This is the text to be displayed(most likely representing the time of an event).  It is the responsibility of the caller to escape any entities as needed. This allows html tags to be used in the $displayString if desired.
- * @return string html anchor element with javascript onclick event that edits an appointment
- */
-function create_event_time_anchor($displayString)
-{
-    $title=xl('Click to edit');
-    return "<a class='event_time' onclick='event_time_click(this)' title='" . attr($title) . "'>" . text($displayString) . "</a>";
-}
-[-/php-]
+<link rel="stylesheet" href="[-php-]echo $GLOBALS['webroot'].'/interface/main/calendar/polar_stat_styles.css?v='.time();[-/php-]">
 </head>
+<body[-php-] if (isset($_SESSION['language_direction']) && $_SESSION['language_direction'] == 'rtl') echo ' dir="rtl"'; [-/php-]>
+
+<!-- POLAR Healthcare: Simple Sidebar -->
+<div id="polarSidebar" class="polar-sidebar">
+    <div class="sidebar-header">
+        <h3>Calendar Panel</h3>
+    </div>
+    
+    <div class="sidebar-content">
+        <!-- Clinician Selection -->
+        <div class="form-group">
+            <label>Select Clinician's Schedule</label>
+            <select class="clinician-select" name="pc_username[]">
+                <option value="hagada">Hagad, Alejandro</option>
+                <option value="polaradmin2025">IT/S, POLAR</option>
+            </select>
+            <button type="button" id="applyClinicianSelection" class="btn btn-primary" style="display: none; margin-top: 10px;">
+                Apply Selection
+            </button>
+        </div>
+    </div>
+    
+    <!-- Close button at bottom -->
+    <div class="sidebar-footer">
+        <button id="sidebarClose" class="sidebar-close-bottom">✕ Close Panel</button>
+    </div>
+</div>
+
+<!-- Calendar Toggle Button -->
+<button id="calendarToggle" class="calendar-toggle">📅</button>
+
+<!-- POLAR: bottomLeft removed - we use custom sidebar instead -->
 [-php-]
-echo "<body class = '" . attr($_SESSION['language_direction']) . " calsearch_body w-100'>";
+// POLAR Healthcare: Force calendar appt style to show service descriptions
+$GLOBALS['calendar_appt_style'] = 3;
 [-/php-]
+
+<!-- POLAR: Removed page-content-wrapper and container-fluid to eliminate margins -->
+<div id="bigCal">
+
+<script>
+$(document).ready(function() {
+    console.log('POLAR Healthcare: Sidebar initializing...');
+    
+    // CRITICAL: Force full width with JavaScript to override inline styles
+    $('html, body').css({
+        'width': '100vw',
+        'max-width': '100vw',
+        'min-width': '100vw',
+        'overflow-x': 'hidden',
+        'margin': '0',
+        'padding': '0'
+    });
+    
+    // Force all parent containers to be full width
+    $('#mainBox, .mainFrames, #framesDisplay, .frameDisplay, iframe').css({
+        'width': '100%',
+        'max-width': 'none',
+        'margin-left': '0',
+        'margin-right': '0',
+        'padding-left': '0',
+        'padding-right': '0'
+    });
+    
+    // CRITICAL: Force the actual calendar TABLE to be full width
+    $('#bigCal, .calsearch_body, #bigCal table, table[id], table[class*="cal"]').css({
+        'width': '100%',
+        'max-width': 'none',
+        'margin': '0',
+        'padding': '0'
+    });
+    
+    // Remove any inline width styles on tables
+    $('table').removeAttr('width').css({
+        'width': '100%',
+        'max-width': 'none'
+    });
+    
+    console.log('POLAR Healthcare: Forced full width with JavaScript');
+    
+    // Initialize the sidebar
+    initializeSidebar();
+    
+    // Initialize calendar display
+    setTimeout(function() {
+        initializeCalendarDisplay();
+    }, 500);
+    
+    // CRITICAL: Force vertical fill
+    forceCalendarVerticalFill();
+    
+    console.log('POLAR Healthcare: Sidebar initialized');
+});
+
+// POLAR Healthcare: Force calendar to fill entire vertical space
+function forceCalendarVerticalFill() {
+    console.log('POLAR Healthcare: Forcing vertical fill...');
+    
+    function calculateAndApplyHeight() {
+        // CRITICAL: Only apply vertical fill to MONTH view, not day/week views
+        // Day and week views have different table structures with time columns
+        var isMonthView = $('#bigCal table tbody tr:first td').hasClass('caldow') || 
+                         $('#bigCal table tbody tr').length <= 7; // Month view has ~6 weeks
+        
+        if (!isMonthView) {
+            console.log('POLAR Healthcare: Skipping vertical fill - not in month view');
+            return;
+        }
+        // Get the toolbar height (ONLY toolbar, NOT clinician name - it's inside #bigCal!)
+        var toolbarHeight = $('#topToolbarRight').outerHeight() || 80;
+        
+        // Calculate available height (viewport minus ONLY toolbar - NO BUFFER!)
+        var availableHeight = $(window).height() - toolbarHeight;
+        
+        console.log('POLAR Healthcare: Window height:', $(window).height(), 'px');
+        console.log('POLAR Healthcare: Toolbar height:', toolbarHeight, 'px');
+        console.log('POLAR Healthcare: Available height for #bigCal (NO BUFFER):', availableHeight, 'px');
+        
+        // Force #bigCal to exact height with !important via attr
+        $('#bigCal').attr('style', 
+            'height: ' + availableHeight + 'px !important; ' +
+            'min-height: ' + availableHeight + 'px !important; ' +
+            'max-height: ' + availableHeight + 'px !important; ' +
+            'display: flex !important; ' +
+            'flex-direction: column !important; ' +
+            'overflow: hidden !important;'
+        );
+        
+        // Get clinician name row height (first row in table - "Hagad, Alejandro")
+        var clinicianNameHeight = $('.providerheader').outerHeight() || 0;
+        
+        // Get day-of-week header row height (Mon, Tue, Wed...)
+        var headerHeight = $('#bigCal table thead tr').outerHeight() || 0;
+        if (headerHeight === 0) {
+            // Sometimes header is in tbody's first row
+            headerHeight = $('#bigCal table tbody tr:first').outerHeight() || 30;
+        }
+        
+        // Calculate remaining height for DATA rows (subtract BOTH clinician name AND day headers)
+        var tableBodyHeight = availableHeight - clinicianNameHeight - headerHeight;
+        
+        // Force the table to fill #bigCal
+        $('#bigCal table').attr('style', 
+            'height: 100% !important; ' +
+            'min-height: 100% !important; ' +
+            'width: 100% !important; ' +
+            'table-layout: fixed !important; ' +
+            'border-collapse: collapse !important;'
+        );
+        
+        // Calculate individual row height (EXCLUDE header row)
+        var dataRows = $('#bigCal table tbody tr').not(':first'); // Skip first row (day headers)
+        var numDataRows = dataRows.length;
+        
+        if (numDataRows > 0) {
+            // Account for borders and spacing: subtract 3px per row
+            var borderAllowance = numDataRows * 3; // 3px per row for borders/spacing
+            var rowHeight = ((tableBodyHeight - borderAllowance) / numDataRows);
+            console.log('POLAR Healthcare: Clinician name row height:', clinicianNameHeight, 'px');
+            console.log('POLAR Healthcare: Day header row height:', headerHeight, 'px');
+            console.log('POLAR Healthcare: Table body height (for DATA rows):', tableBodyHeight, 'px');
+            console.log('POLAR Healthcare: Border allowance:', borderAllowance, 'px');
+            console.log('POLAR Healthcare: Number of DATA rows:', numDataRows);
+            console.log('POLAR Healthcare: Calculated row height (with border allowance):', rowHeight, 'px');
+            
+            // Apply to data rows only (not the header row)
+            dataRows.each(function() {
+                $(this).attr('style', 
+                    'height: ' + rowHeight + 'px !important; ' +
+                    'min-height: ' + rowHeight + 'px !important; ' +
+                    'max-height: ' + rowHeight + 'px !important;'
+                );
+            });
+            
+            // Apply to cells in data rows
+            dataRows.find('td').each(function() {
+                $(this).attr('style', 
+                    'height: ' + rowHeight + 'px !important; ' +
+                    'min-height: ' + rowHeight + 'px !important; ' +
+                    'max-height: ' + rowHeight + 'px !important; ' +
+                    'vertical-align: top !important; ' +
+                    'padding: 5px !important; ' +
+                    'overflow: auto !important;'
+                );
+            });
+        }
+        
+        console.log('POLAR Healthcare: Vertical fill applied with !important');
+    }
+    
+    // Apply immediately
+    calculateAndApplyHeight();
+    
+    // Reapply on window resize
+    $(window).on('resize', function() {
+        calculateAndApplyHeight();
+    });
+    
+    // Reapply after a short delay to ensure DOM is fully loaded
+    setTimeout(calculateAndApplyHeight, 1000);
+    setTimeout(calculateAndApplyHeight, 2000);
+}
+
+function initializeSidebar() {
+    console.log('POLAR Healthcare: Checking sidebar elements...');
+    console.log('POLAR Healthcare: Toggle button exists:', $('#calendarToggle').length > 0);
+    console.log('POLAR Healthcare: Sidebar exists:', $('#polarSidebar').length > 0);
+    console.log('POLAR Healthcare: Close button exists:', $('#sidebarClose').length > 0);
+    console.log('POLAR Healthcare: Close button visible:', $('#sidebarClose').is(':visible'));
+    
+    // Toggle sidebar functionality
+    $(document).on('click', '#calendarToggle', function() {
+        console.log('POLAR Healthcare: Calendar toggle clicked');
+        $('#polarSidebar').toggleClass('open');
+    });
+    
+    $(document).on('click', '#sidebarClose', function() {
+        console.log('POLAR Healthcare: Sidebar close button clicked!');
+        $('#polarSidebar').removeClass('open');
+    });
+    
+    // Also handle .sidebar-close class
+    $(document).on('click', '.sidebar-close', function() {
+        console.log('POLAR Healthcare: Sidebar close (by class) clicked!');
+        $('#polarSidebar').removeClass('open');
+    });
+    
+        // Mini calendar removed - not needed
+    
+    // Handle clinician selection changes
+    $(document).on('change', '.clinician-select', function() {
+        console.log('POLAR Healthcare: Clinician selection changed to:', $(this).val());
+        $('#applyClinicianSelection').show();
+    });
+}
+
+// Mini calendar function removed
+
+// Mini calendar navigation function removed
+
+// Clinician selection functionality
+$(document).on('click', '#applyClinicianSelection', function() {
+    try {
+        var selectedValue = $('.clinician-select').val();
+        var selectedText = $('.clinician-select option:selected').text();
+
+        console.log('POLAR Healthcare: Applying clinician selection:', selectedValue, selectedText);
+
+        // Simple single-clinician selection
+        if (selectedValue && selectedValue !== '') {
+            // Update calendar display immediately to prevent flickering
+            updateCalendarDisplayName(selectedText);
+            
+            // Update URL parameters to filter calendar
+            var currentUrl = new URL(window.location);
+            
+            // Remove existing pc_username parameters
+            currentUrl.searchParams.delete('pc_username');
+            currentUrl.searchParams.delete('pc_username[]');
+            
+            // Add specific clinician parameter
+            currentUrl.searchParams.set('pc_username[]', selectedValue);
+            console.log('POLAR Healthcare: Set specific clinician to URL:', selectedValue);
+            
+            // Hide the apply button
+            $('#applyClinicianSelection').hide();
+            
+            // Navigate to the new URL
+            window.location.href = currentUrl.toString();
+        }
+    } catch (error) {
+        console.error('POLAR Healthcare: Error in applyClinicianSelection:', error);
+        // Fallback: just navigate with the selection
+        var selectedValue = $('.clinician-select').val();
+        if (selectedValue) {
+            var currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('pc_username[]', selectedValue);
+            window.location.href = currentUrl.toString();
+        }
+    }
+});
+
+function updateCalendarDisplayName(displayName) {
+    console.log('POLAR Healthcare: Updating main calendar title to:', displayName);
+
+    // Simple approach - just look for the provider header in the calendar
+    var providerHeaders = $('td.providerheader');
+    if (providerHeaders.length > 0) {
+        providerHeaders.each(function() {
+            var text = $(this).text().trim();
+            if (text === 'Alejandro Hagad' || text === 'POLAR IT/S' || text === 'Hagad, Alejandro' || text === 'IT/S, POLAR') {
+                $(this).text(displayName).css({
+                    'font-weight': 'bold',
+                    'text-align': 'center',
+                    'font-size': '16px'
+                });
+                console.log('POLAR Healthcare: Updated provider header to:', displayName);
+            }
+        });
+    } else {
+        console.log('POLAR Healthcare: No provider headers found yet');
+    }
+}
+
+function initializeCalendarDisplay() {
+    // Check current URL parameters to determine what's actually selected
+    var currentUrl = new URL(window.location);
+    
+    // Simple single-clinician detection
+    var username = '';
+    
+    // Check for pc_username[] format (with brackets)
+    var usernames = currentUrl.searchParams.getAll('pc_username[]');
+    if (usernames.length > 0) {
+        username = usernames[0]; // Take first one
+    }
+    
+    // Check for pc_username format (without brackets) - CRITICAL FIX
+    if (!username && currentUrl.searchParams.has('pc_username')) {
+        username = currentUrl.searchParams.get('pc_username');
+    }
+    
+    // Check for pc_username[0] format
+    if (!username && currentUrl.searchParams.has('pc_username[0]')) {
+        username = currentUrl.searchParams.get('pc_username[0]');
+    }
+    
+    console.log('POLAR Healthcare: Found username:', username);
+    
+    // Determine display name
+    var displayName = '';
+    if (username === 'hagada') {
+        displayName = 'Hagad, Alejandro';
+    } else if (username === 'polaradmin2025') {
+        displayName = 'IT/S, POLAR';
+    } else if (username) {
+        displayName = username;
+    } else {
+        displayName = 'Calendar'; // Default when no specific user
+    }
+    
+    console.log('POLAR Healthcare: Display name:', displayName);
+    
+    // Update dropdown to match current selection
+    $('.clinician-select').val(username);
+    
+    // Hide the apply button since this is initialization
+    $('#applyClinicianSelection').hide();
+    updateCalendarDisplayName(displayName);
+}
+
+// Run initialization only once
+var initializationComplete = false;
+function runInitialization() {
+    if (!initializationComplete) {
+        initializeCalendarDisplay();
+        initializationComplete = true;
+        console.log('POLAR Healthcare: Single initialization completed');
+    }
+}
+
+// Run on page load
+$(document).ready(function() {
+    setTimeout(runInitialization, 1000);
+});
+
+// Also run when DOM changes (for AJAX calendar updates)
+$(document).on('DOMSubtreeModified', function() {
+    setTimeout(runInitialization, 500);
+});
+</script>

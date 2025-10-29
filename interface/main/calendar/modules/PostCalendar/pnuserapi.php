@@ -1302,7 +1302,7 @@ function &postcalendar_userapi_pcGetEvents($args)
 
     $event = new CalendarUserGetEventsFilter();
     $event->setEventsByDays($days);
-    $event->setViewType($viewtype);
+    $event->setViewType($viewtype ?? 'month'); // POLAR: Default to 'month' if not set
     $event->setKeywords($s_keywords);
     $event->setCategory($s_category);
     $event->setStartDate($start_date);

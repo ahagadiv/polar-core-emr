@@ -448,7 +448,7 @@ foreach ($providers as $provider) {
     // this is nice when all you see are times on the left side and no head
     // row with the dates or day-of-week (DOW)
     $classForWeekend = is_weekend_day(date('w', $caldate)) ? 'weekend-day' : 'work-day';
-    $provfl = trim($provider['fname'].' '.$provider['lname']);
+    $provfl = trim($provider['lname'].', '.$provider['fname']);
     echo "<td class='schedule $classForWeekend' title='" . attr($provfl) . "' date='" . attr(date("Ymd",$caldate)) . "' provider='" . attr($providerid) . "'>";
     echo "<div class='providerheader providerday'>" . text($provfl) . "<a class='providerXbtn userClose' data-username='" . attr($provider['username']) . "'></a></div>";
     echo "<div class='calendar_day'>";
@@ -608,7 +608,7 @@ foreach ($providers as $provider) {
             
             // Add category label for POLAR Healthcare
             $categoryLabel = "";
-            if ($catname && $catname != "General") {
+            if (isset($catname) && $catname && $catname != "General") {
                 $categoryLabel = " - " . $catname;
             }
             
@@ -761,7 +761,7 @@ foreach ($providers as $provider) {
                 else
                     $divTitle .= "\r\n[" . $catname . ' ' . $comment . "]" . $fname . " " . $lname;
                 $content .= "<span class='appointment'>";
-                $content .= create_event_time_anchor($dispstarth . ":" . sprintf("%02s", $startm));
+                $content .= text($dispstarth . ":" . sprintf("%02s", $startm));
                 if ($event['recurrtype'] > 0) $content .= "<img src='{$this->_tpl_vars['TPL_IMAGE_PATH']}/repeating8.png' border='0' style='margin:0px 2px 0px 2px;' title='" . xla("Repeating event") . "' alt='" . xla("Repeating event") . "'>";
                 $content .= '&nbsp;' . text($event['apptstatus']);
                 if ($patientid) {
@@ -772,7 +772,7 @@ foreach ($providers as $provider) {
                     $link_title .= xla('Age') . ": " . attr($patient_age) . "\n" . xla('DOB') . ": " . attr($patient_dob) . " $comment" . "\n";
                     $link_title .= "(" . xla('Click to view') . ")";
                     $content .= "<a class='link_title' data-pid='". attr($patientid) . "' href='javascript:goPid(" . attr_js($patientid) . ")' title='" . $link_title . "'>";
-                    $content .= "<i class='fas fa-user text-success' onmouseover=\"javascript:ShowImage(" . attr_js($GLOBALS['webroot']."/controller.php?document&retrieve&patient_id=".urlencode($patientid)."&document_id=-1&as_file=false&original_file=true&disable_exit=false&show_original=true&context=patient_picture") . ");\" onmouseout=\"javascript:HideImage();\" title='" . $link_titles . "'></i>";
+                    $content .= "<i class='fas fa-user text-success' onmouseover=\"javascript:ShowImage(" . attr_js($GLOBALS['webroot']."/controller.php?document&retrieve&patient_id=".urlencode($patientid)."&document_id=-1&as_file=false&original_file=true&disable_exit=false&show_original=true&context=patient_picture") . ");\" onmouseout=\"javascript:HideImage();\" title='" . (isset($link_title) ? $link_title : '') . "'></i>";
                     if ($catid == 1) $content .= "<s>";
                     $content .= text($lname);
                     if ($GLOBALS['calendar_appt_style'] != 1) {
@@ -986,10 +986,11 @@ echo "</div>\n";
     }
 
     $(function () {
-        setupDirectTime();
+        // POLAR: Commented out - setupDirectTime() is not defined and causes JavaScript error
+        // setupDirectTime();
         $("#pc_username").change(function() { ChangeProviders(this); });
         $("#pc_facility").change(function() { ChangeProviders(this); });
-        //$("#dayview").click(function() { ChangeView(this); });
+        $("#dayview").click(function() { ChangeView(this); });
         $("#weekview").click(function() { ChangeView(this); });
         $("#monthview").click(function() { ChangeView(this); });
         //$("#yearview").click(function() { ChangeView(this); });

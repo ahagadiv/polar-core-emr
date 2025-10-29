@@ -43,6 +43,18 @@ if (isset($_REQUEST['pc_username']) && $_REQUEST['pc_username']) {
     $sessionSetArray['pc_username'] = $_REQUEST['pc_username'];
 }
 
+// POLAR Healthcare: Simple single-clinician selection only
+// Handle both pc_username[] and pc_username[0] formats for single user
+if (isset($_REQUEST['pc_username']) && is_array($_REQUEST['pc_username'])) {
+    // Standard array format: pc_username[] - take first one
+    $sessionSetArray['pc_username'] = $_REQUEST['pc_username'][0];
+} else {
+    // Check for indexed format: pc_username[0]
+    if (isset($_REQUEST['pc_username[0]']) && $_REQUEST['pc_username[0]']) {
+        $sessionSetArray['pc_username'] = $_REQUEST['pc_username[0]'];
+    }
+}
+
 // FACILITY FILTERING (lemonsoftware) (CHEMED)
 $sessionSetArray['pc_facility'] = 0;
 
@@ -58,7 +70,7 @@ if ($GLOBALS['login_into_facility']) {
 }
 
 // override the cookie if the user doesn't have access to that facility any more
-if ($_SESSION['userauthorized'] != 1 && $GLOBALS['restrict_user_facility']) {
+if (isset($_SESSION['userauthorized']) && $_SESSION['userauthorized'] != 1 && $GLOBALS['restrict_user_facility']) {
     $facilities = getUserFacilities($_SESSION['authUserID']);
     // use the first facility the user has access to, unless...
     $sessionSetArray['pc_facility'] = $facilities[0]['id'];

@@ -1,4 +1,66 @@
-/* POLAR Healthcare - Special styling for urgent appointments */
+/* POLAR Healthcare - Special styling for urgent appointments - Updated 2025-01-27 */
+
+/* CRITICAL: Override OpenEMR's max-content width with MAXIMUM specificity */
+html[class],
+html:not(.nonexistent),
+html {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    overflow-x: hidden !important;
+}
+
+body[class],
+body.min-vw-100,
+body:not(.nonexistent),
+body {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force iframe to be full width too */
+.frameDisplay,
+.frameDisplay iframe,
+iframe[data-bind] {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* POLAR Healthcare: Force our elements to be visible */
+#polarSidebar {
+    display: block !important;
+    visibility: visible !important;
+}
+
+#calendarToggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* POLAR Healthcare: Remove all default margins and ensure full width */
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+}
+
+#mainBox {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+/* Remove any default OpenEMR spacing */
+.min-vw-100 {
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
 
 /* POLAR STAT appointments - blinking indicator for urgency */
@@ -45,54 +107,764 @@
     animation: polarStatBlink 2s infinite;
 }
 
-.appointment-status-traveling {
-    background-color: #fff2cc;
-    border-left: 4px solid #ffc107;
-}
-
-.appointment-status-arrived {
-    background-color: #ffe6cc;
-    border-left: 4px solid #fd7e14;
-}
-
-.appointment-status-complete {
-    background-color: #ccffcc;
-    border-left: 4px solid #28a745;
-}
-
 .appointment-status-cancelled {
-    background-color: #cccccc;
+    background-color: #f8f9fa;
     border-left: 4px solid #6c757d;
-    text-decoration: line-through;
+    opacity: 0.7;
 }
 
-/* Care setting indicators */
-.care-setting-home {
-    background-color: #e6ffe6;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 0.8em;
+/* Hover card styling */
+.appointment-hover-card {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 400px;
 }
 
-.care-setting-clinic {
-    background-color: #e6f3ff;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 0.8em;
+.appointment-hover-card h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 16px;
 }
 
-.care-setting-snf {
-    background-color: #fff2cc;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 0.8em;
+.appointment-hover-card .patient-info {
+    margin-bottom: 10px;
 }
 
-.care-setting-ltach {
-    background-color: #ffe6cc;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 0.8em;
+.appointment-hover-card .appointment-details {
+    margin-bottom: 15px;
+}
+
+.appointment-hover-card .btn {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+/* Calendar controls styling */
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+/* Hide unnecessary buttons */
+.calendar-controls .btn-large {
+    display: none !important;
+}
+
+/* Hide the default OpenEMR left sidebar */
+#bottomLeft {
+    display: none !important;
+}
+
+/* Style the view picker buttons */
+#viewPicker .btn {
+    margin: 0 2px;
+}
+
+#topToolbarRight {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 10px !important;
+    margin: 0 !important;
+}
+
+/* Left side buttons (hamburger, new, search, today) */
+#functions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+
+/* Center the month navigation */
+#dateNAV {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    text-align: center !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+/* Right side buttons (print, refresh, Day, Week, Month) */
+#viewPicker {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+
+/* POLAR Healthcare Sidebar Styles */
+.calendar-toggle {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    z-index: 10000 !important;
+    width: 50px !important;
+    height: 50px !important;
+    background: #007bff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    color: white !important;
+    font-size: 20px !important;
+}
+
+.calendar-toggle:hover {
+    background: #0056b3 !important;
+    transform: scale(1.1) !important;
+}
+
+.polar-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -400px !important;
+    width: 400px !important;
+    height: 100vh !important;
+    background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%) !important; /* Professional light blue gradient */
+    border-right: none !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1) !important;
+    transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) !important; /* Smooth easing */
+    z-index: 9999 !important;
+    overflow-y: auto !important;
+    display: none !important; /* HIDDEN BY DEFAULT */
+}
+
+.polar-sidebar.open {
+    left: 0 !important;
+    display: block !important; /* SHOW when opened */
+}
+
+/* CRITICAL: Force hide sidebar when not open */
+#polarSidebar:not(.open) {
+    display: none !important;
+    visibility: hidden !important;
+    left: -400px !important;
+}
+
+/* Ensure our toggle button is visible */
+.calendar-toggle {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+.sidebar-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 25px !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5) !important;
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%) !important; /* Professional blue gradient */
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+.sidebar-header h3 {
+    margin: 0 !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: white !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important; /* Subtle text shadow for depth */
+}
+
+.sidebar-close {
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    font-size: 28px !important;
+    color: #495057 !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    line-height: 1 !important;
+    font-weight: normal !important;
+}
+
+.sidebar-close:hover {
+    background: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+    transform: scale(1.1) !important;
+}
+
+/* Sidebar footer with close button at bottom */
+.sidebar-footer {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 15px 25px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.1) !important; /* Transparent to show gradient */
+}
+
+.sidebar-close-bottom {
+    width: 100% !important;
+    padding: 12px 20px !important;
+    background: white !important; /* White button on gradient */
+    color: #1565c0 !important; /* Professional blue text */
+    border: 2px solid white !important;
+    border-radius: 6px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+}
+
+.sidebar-close-bottom:hover {
+    background: #1565c0 !important; /* Blue on hover */
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4) !important;
+}
+
+/* Force visibility of close button */
+#sidebarClose {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 10001 !important;
+}
+
+.sidebar-content {
+    padding: 25px !important;
+}
+
+.form-group {
+    margin-bottom: 25px !important;
+    background: white !important; /* White card background */
+    padding: 20px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.form-group label {
+    font-weight: 600 !important;
+    color: #495057 !important;
+    margin-bottom: 10px !important;
+    display: block !important;
+    font-size: 14px !important;
+}
+
+.clinician-select {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    background: white !important;
+    color: #495057 !important;
+    transition: all 0.3s ease !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 16px !important;
+}
+
+.clinician-select:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    outline: none !important;
+}
+
+#applyClinicianSelection {
+    width: 100% !important;
+    padding: 12px 20px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+#applyClinicianSelection:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Mini calendar in sidebar */
+#datePicker {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin-bottom: 25px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+}
+
+#datePicker table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+#datePicker th,
+#datePicker td {
+    text-align: center !important;
+    padding: 10px 6px !important;
+    border: none !important;
+    color: #495057 !important;
+    font-size: 13px !important;
+}
+
+#datePicker th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    font-weight: 600 !important;
+    color: #6c757d !important;
+    border-radius: 6px !important;
+    margin-bottom: 5px !important;
+}
+
+#datePicker td:hover {
+    background: rgba(102, 126, 234, 0.1) !important;
+    cursor: pointer !important;
+    border-radius: 6px !important;
+    color: #667eea !important;
+    transform: scale(1.05) !important;
+    transition: all 0.2s ease !important;
+}
+
+#datePicker .today {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+}
+
+#datePicker .selected {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+}
+
+/* Navigation arrows for mini calendar */
+#datePicker .nav-arrow {
+    cursor: pointer !important;
+    font-size: 18px !important;
+    color: #667eea !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+}
+
+#datePicker .nav-arrow:hover {
+    color: white !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    transform: scale(1.1) !important;
+}
+
+/* POLAR: Ensure date picker inputs are clickable and not blocked */
+input.datepicker,
+input#start,
+input#end {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Remove old conflicting sidebar styles */
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .polar-sidebar {
+        width: 100% !important;
+        left: -100% !important;
+    }
+    
+    .calendar-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #topToolbarRight {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .appointment-hover-card {
+        min-width: 250px;
+        max-width: 90vw;
+    }
+    
+    .calendar-toggle {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 18px !important;
+    }
+}
+
+/* Ensure calendar fills the ENTIRE page - both width AND height */
+#bigCal {
+    width: 100% !important;
+    height: calc(100vh - 200px) !important; /* Full viewport height minus header space */
+    min-height: calc(100vh - 200px) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important; /* No scrollbars */
+}
+
+/* Force the parent containers to also fill height */
+.calsearch_body {
+    height: 100% !important;
+    min-height: calc(100vh - 200px) !important;
+}
+
+.page-content-wrapper {
+    height: 100% !important;
+    min-height: calc(100vh - 200px) !important;
+}
+
+/* CRITICAL: Ensure HTML and BODY inside iframe fill viewport */
+html,
+body {
+    height: 100% !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+}
+
+/* Ensure calendar table fills full width AND height */
+#bigCal table,
+#bigCal > table,
+table.table_cal,
+.table_cal {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    flex: 1 !important; /* Expand to fill parent */
+    margin: 0 !important;
+    padding: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+}
+
+/* Make each date cell fill available height - MUCH BIGGER */
+#bigCal table td,
+#bigCal table th {
+    height: auto !important;
+    min-height: 200px !important; /* Increased from 150px */
+    vertical-align: top !important;
+    padding: 10px !important; /* Increased padding */
+}
+
+/* Force calendar rows to be equal height - TALLER */
+#bigCal table tr {
+    height: 20% !important; /* 100% / 5 rows (typical month view) */
+}
+
+/* Make the calendar date cells grow to fill space */
+#bigCal table td.caldatebox,
+#bigCal table td[id*="td_"],
+#bigCal table td.providerheader {
+    height: 100% !important;
+    min-height: 200px !important; /* Increased from 150px */
+}
+
+/* CRITICAL: Make the tbody fill the entire table height */
+#bigCal table tbody {
+    height: 100% !important;
+}
+
+/* Force the calendar to have NO max-width */
+#bigCal,
+#bigCal *,
+.calsearch_body,
+.calsearch_body * {
+    max-width: none !important;
+}
+
+/* Calendar container should be full width */
+.calsearch_body {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force calendar cells to be equal width */
+#bigCal table td,
+#bigCal table th {
+    width: 14.28% !important; /* 100% / 7 days */
+}
+
+/* Ensure the main calendar wrapper is full width */
+.calendar-wrapper,
+#calendar-container,
+.calendar-main {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove default OpenEMR left margins and spacing */
+.page-content-wrapper,
+.container-fluid,
+.calsearch_body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Force full width for calendar container */
+.mainFrames,
+#framesDisplay,
+.frameDisplay {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove any iframe margins */
+iframe {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Additional calendar width fixes */
+.calendar-month-view,
+.month-view,
+#calendar-content,
+.postcalendar-content {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure no container limits the width */
+.container,
+.container-fluid {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* AGGRESSIVE: Force absolutely everything to be full width */
+html,
+body,
+#mainBox,
+.mainFrames,
+#framesDisplay,
+.frameDisplay,
+iframe,
+.min-vw-100,
+#bigCal,
+.calsearch_body,
+#topToolbarRight,
+.page-content-wrapper,
+.container-fluid,
+.calendar-wrapper,
+#calendar-container,
+.calendar-main,
+.postcalendar-content,
+#wrapper,
+.sticky-top {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* CRITICAL: Remove wrapper padding/margins that create left gap */
+#wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+}
+
+/* Force container-fluid to be actually full width */
+.container-fluid.sticky-top,
+.container-fluid.calsearch_body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Remove Bootstrap container padding that might cause gaps */
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* NUCLEAR OPTION: Force EVERYTHING in calendar iframe to be 100% width */
+* {
+    box-sizing: border-box !important;
+}
+
+/* Override any OpenEMR default spacing */
+body > div,
+body > iframe,
+body > form {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+/* Specific calendar element targeting */
+div[id*="cal"],
+div[class*="cal"],
+div[id*="Cal"],
+div[class*="Cal"] {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Month title styling */
+.calendar-title,
+.month-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    margin: 20px 0;
+    color: #333;
+}
+
+/* Fix any white text issues */
+.calendar-sidebar *,
+#datePicker *,
+.appointment-hover-card * {
+    color: #333 !important;
+}
+
+/* Service description visibility improvements */
+.month_event {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    padding: 3px 5px !important;
+}
+
+.month_event .text-success {
+    color: #28a745 !important;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    display: inline-block !important;
+    margin-left: 2px !important;
+}
+
+.month_event a {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+.month_event span {
+    font-size: 11px !important;
+}
+
+.month_event {
+    min-height: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+/* POLAR Healthcare Status Indicators */
+.status-scheduled {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.status-confirmed {
+    background-color: #e8f5e8;
+    color: #388e3c;
+    border: 1px solid #c8e6c9;
+}
+
+.status-arrived {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-late {
+    background-color: #ffeaa7;
+    color: #6c5ce7;
+    border: 1px solid #fdcb6e;
+}
+
+.status-inprogress {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.status-checkedout {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-stat {
+    background-color: #ff0000;
+    color: #ffffff;
+    border: 1px solid #cc0000;
+    animation: polarStatBlink 1.5s infinite;
+}
+
+.status-other {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
 }
 
 .care-setting-hospital {
@@ -130,3 +902,5 @@
     visibility: visible;
     opacity: 1;
 }
+
+/* POLAR Healthcare: Calendar with working sidebar and hover cards - NO weekly view modifications */

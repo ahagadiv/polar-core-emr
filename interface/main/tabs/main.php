@@ -411,14 +411,44 @@ $twig = (new TwigContainer(null, $GLOBALS['kernel']))->getTwig();
             . ',' . json_encode($userQuery['lname'])
             . ',' . json_encode($_SESSION['authProvider']); ?>));
     </script>
+    <!-- POLAR Healthcare: Removed max-content width to allow full-page calendar -->
     <style>
       html,
       body {
-        width: max-content;
+        width: 100vw !important;
         min-height: 100% !important;
         height: 100% !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      /* POLAR Healthcare: Add proper left margin to logo */
+      .navbar-brand {
+        margin-left: 15px !important;
+      }
+      
+      /* POLAR Healthcare: Match top navigation bar with sidebar gradient */
+      .navbar.navbar-expand-xl.navbar-light.bg-light {
+        background: linear-gradient(90deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      /* Ensure navigation links are visible on gradient */
+      .navbar .menuLabel,
+      .navbar .appMenu a {
+        color: #1565c0 !important;
+        font-weight: 500 !important;
+      }
+      
+      .navbar .menuLabel:hover,
+      .navbar .appMenu a:hover {
+        color: #0d47a1 !important;
       }
     </style>
+    
+    <!-- POLAR Healthcare: Ultimate override CSS - loads LAST -->
+    <link rel="stylesheet" href="<?php echo $GLOBALS['webroot']; ?>/public/themes/polar_full_width_override.css?v=<?php echo time(); ?>" />
 </head>
 
 <body class="min-vw-100">
@@ -528,6 +558,86 @@ $twig = (new TwigContainer(null, $GLOBALS['kernel']))->getTwig();
     }
 
     ?>
+    
+    <!-- POLAR Healthcare: Force full width after page load -->
+    <script>
+    function forceFullWidth() {
+        // Force html and body
+        $('html, body').css({
+            'width': '100vw',
+            'max-width': '100vw',
+            'min-width': '100vw',
+            'overflow-x': 'hidden',
+            'margin': '0',
+            'padding': '0'
+        });
+        
+        // Force all main containers
+        $('#mainBox, .mainFrames, #framesDisplay, .frameDisplay').css({
+            'width': '100%',
+            'max-width': 'none',
+            'margin-left': '0',
+            'margin-right': '0',
+            'padding-left': '0',
+            'padding-right': '0'
+        });
+        
+        // Force iframes
+        $('iframe').css({
+            'width': '100%',
+            'max-width': 'none',
+            'margin': '0',
+            'padding': '0'
+        });
+        
+        // Force navigation elements
+        $('.navbar, #attendantData, #tabs_div, .tabControls').css({
+            'width': '100%',
+            'max-width': 'none',
+            'margin': '0',
+            'padding-left': '0',
+            'padding-right': '0'
+        });
+        
+        // REMOVE the left panel completely from DOM
+        $('.tabsNoHover.w-1').remove();
+        
+        // Force the tab controls to fill the gap
+        $('.tabControls').css({
+            'justify-content': 'flex-start',
+            'gap': '0',
+            'padding-left': '0'
+        });
+    }
+    
+    $(document).ready(function() {
+        console.log('POLAR Healthcare: Forcing parent window full width...');
+        
+        // Force initially
+        forceFullWidth();
+        
+        // Keep forcing every 100ms for the first 2 seconds
+        var counter = 0;
+        var interval = setInterval(function() {
+            forceFullWidth();
+            counter++;
+            if (counter >= 20) { // 20 * 100ms = 2 seconds
+                clearInterval(interval);
+                console.log('POLAR Healthcare: Parent window forced to full width (stopped continuous forcing)');
+                
+                // DIAGNOSTIC: Log actual widths
+                console.log('POLAR Healthcare DIAGNOSTIC:');
+                console.log('  - Window width:', $(window).width(), 'px');
+                console.log('  - Body width:', $('body').width(), 'px');
+                console.log('  - #mainBox width:', $('#mainBox').width(), 'px');
+                console.log('  - #framesDisplay width:', $('#framesDisplay').width(), 'px');
+                console.log('  - .tabsNoHover.w-1 count:', $('.tabsNoHover.w-1').length);
+            }
+        }, 100);
+        
+        console.log('POLAR Healthcare: Parent window full width enforcement started');
+    });
+    </script>
 </body>
 
 </html>

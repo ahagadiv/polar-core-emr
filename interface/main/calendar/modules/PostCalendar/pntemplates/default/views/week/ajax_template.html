@@ -419,7 +419,7 @@ foreach ($providers as $provider) {
     echo "<table class='table border-0'>\n";
     echo " <tr>\n";
     echo "  <td colspan='8' class='providerheader'>";
-    echo text($provider['fname']) . " " . text($provider['lname']);
+    echo text($provider['lname']) . ", " . text($provider['fname']);
     echo "</td>\n";
     echo " </tr>\n";
 
@@ -757,7 +757,7 @@ foreach ($providers as $provider) {
                     $divTitle .= "\r\n[" . $catname . ' ' . $comment . "]" .$fname . " " . $lname;
 
                 $content .= "<span class='appointment" . attr($apptToggle ?? "") . "'>";
-                $content .= create_event_time_anchor($dispstarth . ':' . sprintf("%02s", $startm));
+                $content .= text($dispstarth . ':' . sprintf("%02s", $startm));
                 if ($event['recurrtype'] > 0) $content .= "<img src='{$this->_tpl_vars['TPL_IMAGE_PATH']}/repeating8.png' class='border-0' style='margin:0 2px 0 2px;' title='Repeating event' alt='Repeating event' />";
                 $content .= text($event['apptstatus']);
                 if ($patientid) {
@@ -912,11 +912,12 @@ foreach ($providers as $provider) {
     var tsHeightNum=[-php-] echo js_escape($timeslotHeightVal); [-/php-];
 
     $(function () {
-        setupDirectTime();
+        // POLAR: Commented out - setupDirectTime() is not defined and causes JavaScript error
+        // setupDirectTime();
         $("#pc_username").change(function() { ChangeProviders(this); });
         $("#pc_facility").change(function() { ChangeProviders(this); });
         $("#dayview").click(function() { ChangeView(this); });
-        //$("#weekview").click(function() { ChangeView(this); });
+        $("#weekview").click(function() { ChangeView(this); });
         $("#monthview").click(function() { ChangeView(this); });
         //$("#yearview").click(function() { ChangeView(this); });
         $(".tdDatePicker").click(function() {

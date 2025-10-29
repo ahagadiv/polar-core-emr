@@ -117,7 +117,7 @@ function postcalendar_user_search()
 {
     $tpl = new pcSmarty();
     $k = pnVarCleanFromInput('pc_keywords') ?? '';
-    $k_andor = pnVarCleanFromInput('pc_keywords_andor');
+    $k_andor = pnVarCleanFromInput('pc_keywords_andor') ?? 'AND'; // POLAR: Default to 'AND' if not set
     $pc_category = pnVarCleanFromInput('pc_category');
     $pc_facility = pnVarCleanFromInput('pc_facility');
     $pc_topic = pnVarCleanFromInput('pc_topic');
@@ -145,17 +145,19 @@ function postcalendar_user_search()
     $tpl->assign('event_dur_hours', $event_dur_hours);
     $tpl->assign('event_dur_minutes', $event_dur_minutes);
 
-    // create default start and end dates for the search form
+    // POLAR Healthcare: Wide date range for efficient searching
+    // Default to 2 years in the past to 2 years in the future
+    // This allows clinicians to search by name and see ALL appointments without date restrictions
     if (isset($start) && $start != "") {
         $tpl->assign('DATE_START', $start);
     } else {
-        $tpl->assign('DATE_START', date("m/d/Y"));
+        $tpl->assign('DATE_START', date("m/d/Y", strtotime("-2 years"))); // 2 years ago
     }
 
     if (isset($end) && $end != "") {
         $tpl->assign('DATE_END', $end);
     } else {
-        $tpl->assign('DATE_END', date("m/d/Y", strtotime("+7 Days", time())));
+        $tpl->assign('DATE_END', date("m/d/Y", strtotime("+2 years"))); // 2 years from now
     }
 
     // then override the setting if we have a value from the submitted form
@@ -436,7 +438,7 @@ function postcalendar_user_search()
 
     $tpl->caching = false;
     $tpl->assign('STYLE', $GLOBALS['style']);
-    $pageSetup =& pnModAPIFunc(__POSTCALENDAR__, 'user', 'pageSetup');
+    $pageSetup = pnModAPIFunc(__POSTCALENDAR__, 'user', 'pageSetup'); // POLAR: Removed reference assignment
     $return = $pageSetup . $tpl->fetch($template_name . '/user/ajax_search.html');
     return $return;
 }

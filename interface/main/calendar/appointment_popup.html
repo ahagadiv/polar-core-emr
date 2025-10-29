@@ -1,0 +1,542 @@
+<!-- POLAR Healthcare Appointment Popup Modal -->
+<div id="appointmentPopup" class="appointment-popup-modal" style="display: none;">
+    <div class="popup-backdrop" onclick="closeAppointmentPopup()"></div>
+    <div class="popup-content">
+        <div class="popup-header">
+            <h3 id="popupTime">11:00 - 12:00</h3>
+            <button class="popup-close" onclick="closeAppointmentPopup()">&times;</button>
+        </div>
+        
+        <div class="popup-body">
+            <!-- Visit Information -->
+            <div class="popup-section">
+                <div class="visit-info">
+                    <span id="popupVisitNumber">Visit #535222</span>
+                    <span id="popupDuration">• Care Time: 60min</span>
+                </div>
+            </div>
+            
+            <!-- Status Buttons -->
+            <div class="popup-section">
+                <div class="status-buttons">
+                    <button class="status-btn status-scheduled active" onclick="changeAppointmentStatus('S')">
+                        <i class="fa fa-calendar-check"></i> Scheduled
+                    </button>
+                    <button class="status-btn status-complete" onclick="changeAppointmentStatus('V')">
+                        <i class="fa fa-check-circle"></i> Complete
+                    </button>
+                    <button class="status-btn status-cancelled" onclick="changeAppointmentStatus('x')">
+                        <i class="fa fa-times-circle"></i> Cancelled
+                    </button>
+                    <button class="status-btn status-noshow" onclick="changeAppointmentStatus('?')">
+                        <i class="fa fa-user-times"></i> No Show
+                    </button>
+                    <button class="status-btn status-arrived" onclick="changeAppointmentStatus('@')">
+                        <i class="fa fa-user-check"></i> Arrived
+                    </button>
+                    <button class="status-btn status-inprogress" onclick="changeAppointmentStatus('<')">
+                        <i class="fa fa-user-md"></i> In Progress
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Patient Information -->
+            <div class="popup-section">
+                <h4><i class="fa fa-user"></i> Patient Details</h4>
+                <div class="patient-info">
+                    <div class="info-row">
+                        <strong id="popupPatientName">Faith McCaskill</strong>
+                    </div>
+                    <div class="info-row">
+                        <span id="popupPatientDemographics">Female • 16 yrs, 08/18/2009</span>
+                    </div>
+                    <div class="info-row">
+                        <span id="popupPatientPhone">(713) 202-3231</span>
+                    </div>
+                    <div class="info-row">
+                        <span id="popupPatientAddress">2724 61ST ST, Galveston, TX 77751</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Provider Information -->
+            <div class="popup-section">
+                <h4><i class="fa fa-user-md"></i> Provider Details</h4>
+                <div class="provider-info">
+                    <div class="info-row">
+                        <strong id="popupProviderName">Alejandro Hagad</strong>
+                    </div>
+                    <div class="info-row">
+                        <span id="popupProviderTitle">POLAR™ | VASCULAR ACCESS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Service Information -->
+            <div class="popup-section">
+                <h4><i class="fa fa-stethoscope"></i> Service Details</h4>
+                <div class="service-info">
+                    <div class="info-row">
+                        <span id="popupServiceName">Vascular Access Service - PICC</span>
+                    </div>
+                    <div class="info-row">
+                        <span id="popupServiceLocation">Clinic</span>
+                    </div>
+                    <div class="info-row" id="popupComments" style="display: none;">
+                        <em>Comments: <span id="popupCommentsText"></span></em>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="popup-actions">
+                <button class="btn btn-primary" onclick="openFullAppointmentForm()">
+                    <i class="fa fa-edit"></i> Edit Full Details
+                </button>
+                <button class="btn btn-secondary" onclick="viewPatientRecord()">
+                    <i class="fa fa-user"></i> View Patient Record
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* POLAR Healthcare Appointment Popup Styles */
+.appointment-popup-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.popup-content {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 10001;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.popup-header h3 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.popup-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.popup-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.popup-body {
+    padding: 20px;
+}
+
+.popup-section {
+    margin-bottom: 20px;
+}
+
+.popup-section h4 {
+    margin: 0 0 10px 0;
+    color: #1e3a8a;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.visit-info {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.status-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.status-btn {
+    padding: 8px 12px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.status-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-btn.active {
+    background: #10b981;
+    color: white;
+    border-color: #059669;
+}
+
+.status-btn.status-complete:hover {
+    background: #10b981;
+    color: white;
+    border-color: #059669;
+}
+
+.status-btn.status-cancelled:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #dc2626;
+}
+
+.status-btn.status-noshow:hover {
+    background: #6b7280;
+    color: white;
+    border-color: #4b5563;
+}
+
+.status-btn.status-arrived:hover {
+    background: #f59e0b;
+    color: white;
+    border-color: #d97706;
+}
+
+.status-btn.status-inprogress:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #2563eb;
+}
+
+.patient-info, .provider-info, .service-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #3b82f6;
+}
+
+.info-row {
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.popup-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .popup-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .status-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .popup-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+// Global variables for popup
+let currentAppointmentId = null;
+let currentPatientId = null;
+
+// Show appointment popup
+function showAppointmentPopup(appointmentData) {
+    currentAppointmentId = appointmentData.eid;
+    currentPatientId = appointmentData.pid;
+    
+    // Populate popup with appointment data
+    document.getElementById('popupTime').textContent = appointmentData.time;
+    document.getElementById('popupVisitNumber').textContent = `Visit #${appointmentData.eid}`;
+    document.getElementById('popupDuration').textContent = `• Care Time: ${appointmentData.duration}min`;
+    document.getElementById('popupPatientName').textContent = appointmentData.patientName;
+    document.getElementById('popupPatientDemographics').textContent = `${appointmentData.patientGender} • ${appointmentData.patientAge} yrs, ${appointmentData.patientDob}`;
+    document.getElementById('popupPatientPhone').textContent = appointmentData.patientPhone || 'N/A';
+    document.getElementById('popupPatientAddress').textContent = appointmentData.patientAddress || 'N/A';
+    document.getElementById('popupProviderName').textContent = appointmentData.providerName;
+    document.getElementById('popupProviderTitle').textContent = appointmentData.providerTitle || 'POLAR™ | VASCULAR ACCESS';
+    document.getElementById('popupServiceName').textContent = appointmentData.serviceName;
+    document.getElementById('popupServiceLocation').textContent = appointmentData.serviceLocation || 'Clinic';
+    
+    if (appointmentData.comments) {
+        document.getElementById('popupCommentsText').textContent = appointmentData.comments;
+        document.getElementById('popupComments').style.display = 'block';
+    } else {
+        document.getElementById('popupComments').style.display = 'none';
+    }
+    
+    // Update status buttons
+    updateStatusButtons(appointmentData.status);
+    
+    // Show popup
+    document.getElementById('appointmentPopup').style.display = 'flex';
+}
+
+// Close appointment popup
+function closeAppointmentPopup() {
+    document.getElementById('appointmentPopup').style.display = 'none';
+    currentAppointmentId = null;
+    currentPatientId = null;
+}
+
+// Update status button states
+function updateStatusButtons(currentStatus) {
+    // Remove active class from all buttons
+    document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add active class to current status
+    const statusMap = {
+        'S': 'status-scheduled',
+        'V': 'status-complete',
+        'x': 'status-cancelled',
+        '?': 'status-noshow',
+        '@': 'status-arrived',
+        '<': 'status-inprogress'
+    };
+    
+    const activeClass = statusMap[currentStatus] || 'status-scheduled';
+    document.querySelector(`.${activeClass}`).classList.add('active');
+}
+
+// Change appointment status
+function changeAppointmentStatus(newStatus) {
+    if (!currentAppointmentId) return;
+    
+    // Show loading state
+    const button = event.target.closest('.status-btn');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Updating...';
+    button.disabled = true;
+    
+    // Make AJAX request to update status
+    fetch('update_appointment_status.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            appointmentId: currentAppointmentId,
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update UI
+            updateStatusButtons(newStatus);
+            
+            // Refresh calendar
+            if (typeof refreshCalendar === 'function') {
+                refreshCalendar();
+            }
+            
+            // Show success message
+            showNotification('Appointment status updated successfully!', 'success');
+        } else {
+            showNotification('Failed to update appointment status: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while updating the appointment status', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+// Open full appointment form
+function openFullAppointmentForm() {
+    if (currentAppointmentId) {
+        // Close popup first
+        closeAppointmentPopup();
+        
+        // Open the existing appointment edit form
+        if (typeof oldEvt === 'function') {
+            // Extract date and event ID for the oldEvt function
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            oldEvt(date, currentAppointmentId, '');
+        }
+    }
+}
+
+// View patient record
+function viewPatientRecord() {
+    if (currentPatientId) {
+        // Close popup first
+        closeAppointmentPopup();
+        
+        // Navigate to patient record
+        if (typeof goPid === 'function') {
+            goPid(currentPatientId);
+        }
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        z-index: 10002;
+        animation: slideIn 0.3s ease;
+        max-width: 300px;
+    `;
+    
+    // Set background color based on type
+    const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#3b82f6',
+        warning: '#f59e0b'
+    };
+    notification.style.backgroundColor = colors[type] || colors.info;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Add CSS for notifications
+const notificationCSS = `
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+`;
+
+const style = document.createElement('style');
+style.textContent = notificationCSS;
+document.head.appendChild(style);
+</script>

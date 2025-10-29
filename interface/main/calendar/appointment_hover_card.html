@@ -1,0 +1,698 @@
+<!-- POLAR Healthcare Appointment Hover Card -->
+<div id="appointmentHoverCard" class="appointment-hover-card">
+    <div class="hover-card-header">
+        <div class="visit-info">
+            <span id="hoverVisitId" class="visit-id">Visit #530230</span>
+            <span id="hoverVisitStatus" class="visit-status">This visit is passed</span>
+        </div>
+        <div class="hover-card-actions">
+            <button id="clockInBtn" class="btn-clock-in" onclick="clockIn()">
+                <i class="fa fa-clock"></i> Clock In
+            </button>
+            <button class="btn-close" onclick="closeHoverCard()">&times;</button>
+        </div>
+    </div>
+    
+    <div class="hover-card-tabs">
+        <button class="tab-btn active" onclick="switchTab('information')">Information</button>
+        <button class="tab-btn" onclick="switchTab('interventions')">Interventions</button>
+        <button class="tab-btn" onclick="switchTab('forms')">Forms</button>
+    </div>
+    
+    <div class="hover-card-content">
+        <!-- Information Tab -->
+        <div id="tab-information" class="tab-content active">
+            <div class="info-grid">
+                <div class="info-column">
+                    <h4>Employee Details</h4>
+                    <div class="info-item">
+                        <label>Employee:</label>
+                        <span id="hoverEmployee">Alejandro Hagad, Flexable</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Service Code:</label>
+                        <span id="hoverServiceCode">Vascular Access Service</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Date:</label>
+                        <span id="hoverDate">10/09/2025</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Time:</label>
+                        <span id="hoverTime">16:00 - 17:00</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Authorization:</label>
+                        <span id="hoverAuth" class="status-not-authorized">Not Authorized</span>
+                    </div>
+                </div>
+                
+                <div class="info-column">
+                    <h4>Client Details</h4>
+                    <div class="info-item">
+                        <label>Client:</label>
+                        <span id="hoverClient">Faith McCaskill <i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="info-item">
+                        <label>Demographics:</label>
+                        <span id="hoverDemographics">Female, 16 yrs, 08/18/2009</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone:</label>
+                        <span id="hoverPhone">(713) 202-3231</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Address:</label>
+                        <span id="hoverAddress">2724 61ST ST, Galveston, TX 77751</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Service:</label>
+                        <span id="hoverService">Vascular Access Service - PICC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interventions Tab -->
+        <div id="tab-interventions" class="tab-content">
+            <div class="interventions-header">
+                <span class="interventions-count">0/0</span>
+                <button class="btn-add-intervention">+ Add Intervention</button>
+            </div>
+            <div class="no-data">No data found</div>
+        </div>
+        
+        <!-- Forms Tab -->
+        <div id="tab-forms" class="tab-content">
+            <div class="forms-header">
+                <span class="forms-count">Forms 3/3</span>
+                <button class="btn-edit-all">Edit all completed</button>
+            </div>
+            <div class="forms-list">
+                <div class="form-item completed">
+                    <div class="form-icon"><i class="fa fa-check-circle"></i></div>
+                    <div class="form-details">
+                        <div class="form-title">POLAR Vascular Access Safety Checklist</div>
+                        <div class="form-submitted">Last submitted on 10/10/2025 17:25</div>
+                    </div>
+                    <button class="btn-view">View submission</button>
+                </div>
+                <div class="form-item completed">
+                    <div class="form-icon"><i class="fa fa-check-circle"></i></div>
+                    <div class="form-details">
+                        <div class="form-title">Patient Assessment Form</div>
+                        <div class="form-submitted">Last submitted on 10/10/2025 17:27</div>
+                    </div>
+                    <button class="btn-view">View submission</button>
+                </div>
+                <div class="form-item completed">
+                    <div class="form-icon"><i class="fa fa-check-circle"></i></div>
+                    <div class="form-details">
+                        <div class="form-title">Vascular Access Documentation</div>
+                        <div class="form-submitted">Last submitted on 10/10/2025 17:54</div>
+                    </div>
+                    <button class="btn-view">View submission</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="hover-card-footer">
+        <button class="btn-primary" onclick="openFullAppointment()">
+            <i class="fa fa-edit"></i> Edit Full Details
+        </button>
+        <button class="btn-secondary" onclick="viewPatientRecord()">
+            <i class="fa fa-user"></i> View Patient Chart
+        </button>
+        <button class="btn-info" onclick="clockIn()">
+            <i class="fa fa-clock"></i> Clock In/Out
+        </button>
+    </div>
+</div>
+
+<style>
+/* Hover Card Styles */
+.appointment-hover-card {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 400px;
+    max-width: 500px;
+    display: none;
+    margin-top: 5px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.appointment-hover-card.show {
+    display: block;
+    animation: slideDown 0.2s ease;
+}
+
+.hover-card-header {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.visit-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visit-id {
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.visit-status {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.hover-card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-clock-in {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-clock-in:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.hover-card-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    color: #1e3a8a;
+    border-bottom-color: #1e3a8a;
+    background: white;
+}
+
+.tab-btn:hover {
+    background: rgba(30, 58, 138, 0.05);
+}
+
+.hover-card-content {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.info-column h4 {
+    margin: 0 0 15px 0;
+    color: #1e3a8a;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.info-item {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-item label {
+    font-size: 0.8em;
+    color: #666;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item span {
+    font-size: 0.9em;
+    color: #333;
+}
+
+.status-not-authorized {
+    color: #ef4444;
+    font-weight: 500;
+}
+
+.interventions-header, .forms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.interventions-count, .forms-count {
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+.btn-add-intervention, .btn-edit-all {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+.forms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+.form-item.completed {
+    background: #f0f9ff;
+    border-color: #bfdbfe;
+}
+
+.form-icon {
+    color: #10b981;
+    font-size: 1.2em;
+}
+
+.form-details {
+    flex: 1;
+}
+
+.form-title {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.form-submitted {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.btn-view {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.hover-card-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 8px;
+    background: #f8f9fa;
+    border-radius: 0 0 8px 8px;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary, .btn-info {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.btn-primary {
+    background: #1e3a8a;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1e40af;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.btn-info {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #2563eb;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .appointment-hover-card {
+        min-width: 300px;
+        max-width: 350px;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .hover-card-footer {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+// Global variables
+let currentHoverCard = null;
+let currentAppointmentData = null;
+
+// Show hover card
+function showHoverCard(appointmentData, container) {
+    // Hide any existing hover card
+    hideHoverCard();
+    
+    currentAppointmentData = appointmentData;
+    currentHoverCard = document.getElementById('appointmentHoverCard');
+    
+    // Populate data
+    document.getElementById('hoverVisitId').textContent = `Visit #${appointmentData.eid}`;
+    document.getElementById('hoverVisitStatus').textContent = getStatusText(appointmentData.status);
+    document.getElementById('hoverEmployee').textContent = `${appointmentData.providerName}, POLAR Healthcare`;
+    document.getElementById('hoverServiceCode').textContent = appointmentData.serviceName;
+    document.getElementById('hoverDate').textContent = formatDate(appointmentData.date);
+    document.getElementById('hoverTime').textContent = appointmentData.time;
+    document.getElementById('hoverClient').innerHTML = `${appointmentData.patientName} <i class="fa fa-info-circle"></i>`;
+    document.getElementById('hoverDemographics').textContent = appointmentData.patientDemographics;
+    document.getElementById('hoverPhone').textContent = appointmentData.patientPhone;
+    document.getElementById('hoverAddress').textContent = appointmentData.patientAddress;
+    document.getElementById('hoverService').textContent = appointmentData.serviceName;
+    
+    // Position the card
+    const rect = container.getBoundingClientRect();
+    currentHoverCard.style.position = 'fixed';
+    currentHoverCard.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+    currentHoverCard.style.left = (rect.left + window.scrollX) + 'px';
+    currentHoverCard.style.right = 'auto';
+    
+    // Show the card
+    currentHoverCard.classList.add('show');
+    
+    // Add click outside listener
+    setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+    }, 100);
+}
+
+// Hide hover card
+function hideHoverCard() {
+    if (currentHoverCard) {
+        currentHoverCard.classList.remove('show');
+        currentHoverCard = null;
+        currentAppointmentData = null;
+    }
+    document.removeEventListener('click', handleClickOutside);
+}
+
+// Handle clicks outside the hover card
+function handleClickOutside(event) {
+    if (currentHoverCard && !currentHoverCard.contains(event.target)) {
+        hideHoverCard();
+    }
+}
+
+// Close hover card
+function closeHoverCard() {
+    hideHoverCard();
+}
+
+// Switch tabs
+function switchTab(tabName) {
+    // Remove active class from all tabs and content
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Add active class to selected tab and content
+    event.target.classList.add('active');
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+}
+
+// Clock in/out functionality
+function clockIn() {
+    if (!currentAppointmentData) return;
+    
+    const button = document.getElementById('clockInBtn');
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Clocking In...';
+    button.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Update button state
+        button.innerHTML = '<i class="fa fa-clock"></i> Clock Out';
+        button.onclick = clockOut;
+        button.disabled = false;
+        
+        // Show success notification
+        showNotification('Successfully clocked in!', 'success');
+        
+        // Update appointment status
+        if (currentAppointmentData) {
+            currentAppointmentData.status = 'clocked_in';
+        }
+    }, 1000);
+}
+
+function clockOut() {
+    if (!currentAppointmentData) return;
+    
+    const button = document.getElementById('clockInBtn');
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Clocking Out...';
+    button.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Update button state
+        button.innerHTML = '<i class="fa fa-clock"></i> Clock In';
+        button.onclick = clockIn;
+        button.disabled = false;
+        
+        // Show success notification
+        showNotification('Successfully clocked out!', 'success');
+        
+        // Update appointment status
+        if (currentAppointmentData) {
+            currentAppointmentData.status = 'clocked_out';
+        }
+    }, 1000);
+}
+
+// Open full appointment form
+function openFullAppointment() {
+    if (currentAppointmentData) {
+        hideHoverCard();
+        // Open the existing appointment edit form
+        if (typeof oldEvt === 'function') {
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            oldEvt(date, currentAppointmentData.eid, '');
+        }
+    }
+}
+
+// View patient record
+function viewPatientRecord() {
+    if (currentAppointmentData && currentAppointmentData.pid) {
+        hideHoverCard();
+        if (typeof goPid === 'function') {
+            goPid(currentAppointmentData.pid);
+        }
+    }
+}
+
+// Helper functions
+function getStatusText(status) {
+    const statusMap = {
+        'S': 'Scheduled',
+        'V': 'Visit Complete',
+        'x': 'Cancelled',
+        '?': 'No Show',
+        '@': 'Arrived',
+        '<': 'In Progress',
+        '>': 'Checked Out',
+        'clocked_in': 'Currently Clocked In',
+        'clocked_out': 'Clocked Out'
+    };
+    return statusMap[status] || 'Unknown Status';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        month: '2-digit', 
+        day: '2-digit', 
+        year: 'numeric' 
+    });
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        z-index: 10002;
+        animation: slideIn 0.3s ease;
+        max-width: 300px;
+    `;
+    
+    // Set background color based on type
+    const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#3b82f6',
+        warning: '#f59e0b'
+    };
+    notification.style.backgroundColor = colors[type] || colors.info;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Add CSS for notifications
+const notificationCSS = `
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+`;
+
+const style = document.createElement('style');
+style.textContent = notificationCSS;
+document.head.appendChild(style);
+</script>

@@ -132,8 +132,8 @@ $timeslotHeightUnit="px";
 
  //==================================
  //FACILITY FILTERING (CHEMED)
- $facilities = getUserFacilities($_SESSION['authUserID']); // from users_facility
-if ( $_SESSION['pc_facility'] ) {
+ $facilities = getUserFacilities(isset($_SESSION['authUserID']) ? $_SESSION['authUserID'] : ''); // from users_facility
+if ( isset($_SESSION['pc_facility']) && $_SESSION['pc_facility'] ) {
     $provinfo = getProviderInfo('%', true, $_SESSION['pc_facility']);
  } else {
     $provinfo = getProviderInfo();
@@ -141,14 +141,12 @@ if ( $_SESSION['pc_facility'] ) {
  //EOS FACILITY FILTERING (CHEMED)
  //==================================
 
-$chevron_icon_left = $_SESSION['language_direction'] == 'ltr' ? 'fa-chevron-circle-left' : 'fa-chevron-circle-right';
-$chevron_icon_right = $_SESSION['language_direction'] == 'ltr' ? 'fa-chevron-circle-right' : 'fa-chevron-circle-left';
+$chevron_icon_left = (isset($_SESSION['language_direction']) && $_SESSION['language_direction'] == 'ltr') ? 'fa-chevron-circle-left' : 'fa-chevron-circle-right';
+$chevron_icon_right = (isset($_SESSION['language_direction']) && $_SESSION['language_direction'] == 'ltr') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-left';
 
 [-/php-]
-<div id="wrapper">
-<!-- stuff form element here to avoid the margin padding it introduces into the page in some browsers -->
+<!-- POLAR: Removed wrapper div and container-fluid for full width -->
 <form name='theform' id='theform' action='index.php?module=PostCalendar&func=view&tplview=default&pc_category=&pc_topic=' method='post' onsubmit='return top.restoreSession()'>
-<div class="container-fluid sticky-top">
 <div id="topToolbarRight" class="bgcolor2">
     <!-- this wraps some of the top toolbar items -->
 <div id="functions">
@@ -185,176 +183,10 @@ echo "   <a href='#' type='button' id='monthview' title='" . xla('Month View') .
 [-/php-]
 </div>
 </div> <!-- end topToolbarRight -->
-</div>
-<div class="sticky-top">
-<div id="bottomLeft" class="sidebar-wrapper">
-<div id="datePicker">
-[-php-]
-    // caldate depends on what the user has clicked
-    $caldate = strtotime($Date);
-    $cMonth = date("m", $caldate);
-    $cYear = date("Y", $caldate);
-    $cDay = date("d", $caldate);
+</form>
 
-    include_once($GLOBALS['fileroot'].'/interface/main/calendar/modules/PostCalendar/pntemplates/default/views/monthSelector.php');
-[-/php-]
-<div class="table-responsive">
-<table class='table table-sm table-borderless'>
-<tbody><tr>
-[-php-]
+<!-- POLAR: Removed entire bottomLeft sidebar (mini calendar, provider picker, etc.) -->
 
-// compute the previous month date
-// stay on the same day if possible
-$pDay = $cDay;
-$pMonth = $cMonth - 1;
-$pYear = $cYear;
-if ($pMonth < 1) { $pMonth = 12; $pYear = $cYear - 1; }
-while (! checkdate($pMonth, $pDay, $pYear)) { $pDay = $pDay - 1; }
-$prevMonth = sprintf("%d%02d%02d",$pYear,$pMonth,$pDay);
-
-// compute the next month
-// stay on the same day if possible
-$nDay = $cDay;
-$nMonth = $cMonth + 1;
-$nYear = $cYear;
-if ($nMonth > 12) { $nMonth = 1; $nYear = $cYear + 1; }
-while (! checkdate($nMonth, $nDay, $nYear)) { $nDay = $nDay - 1; }
-$nextMonth = sprintf("%d%02d%02d",$nYear,$nMonth,$nDay);
-[-/php-]
-<td class="tdDOW-small tdDatePicker tdNav" id="[-php-]echo attr($prevMonth)[-/php-]" title="[-php-]echo xla(date("F", strtotime($prevMonth)));[-/php-]">&lt;</td>
-<td colspan="5" class="tdMonthName-small">
-[-php-]
-echo xl(date('F', $caldate));
-[-/php-]
-</td>
-<td class="tdDOW-small tdDatePicker tdNav" id="[-php-]echo attr($nextMonth)[-/php-]" title="[-php-]echo xla(date("F", strtotime($nextMonth)));[-/php-]">&gt;</td>
-<tr>
-[-php-]
-foreach ($DOWlist as $dow) {
-    echo "<td class='tdDOW-small'>" . text($this->_tpl_vars['A_SHORT_DAY_NAMES'][$dow]) . "</td>";
-}
-[-/php-]
-</tr>
-[-php-]
-$atmp = array_keys($A_EVENTS);
-
-foreach ($atmp as $currdate) {
-    $currdate = strtotime($currdate);
-    if (date('w', $currdate) == $DOWlist[0]) {
-        // start of week row
-        $tr = "<tr>";
-        echo $tr;
-    }
-
-    // set the TD class
-    $tdClass = "tdMonthDay-small";
-    if (!empty($month) && (date('m', $currdate) != $month)) {
-        $tdClass = "tdOtherMonthDay-small";
-    }
-    if (is_weekend_day(date('w', $currdate))) {
-        $tdClass = "tdWeekend-small";
-    }
-    if (is_holiday(date('Y-m-d', $currdate))) {
-      $tdClass = "tdHoliday-small";
-    }
-
-    if (date('Ymd',$currdate) == $Date) {
-        // $Date is defined near the top of this file
-        // and is equal to whatever date the user has clicked
-        $tdClass .= " currentDate";
-    }
-
-    // add a class so that jQuery can grab these days for the 'click' event
-    $tdClass .= " tdDatePicker";
-
-    // output the TD
-    $td = "<td ";
-    $td .= "class=\"" . attr($tdClass) . "\" ";
-    //$td .= "id=\"" . attr(date("Ymd", $currdate)) . "\" ";
-    $td .= "id=\"" . attr(date("Ymd", $currdate)) . "\" ";
-    $td .= "title=\"" . xla('Go to') . " " . attr(date('F', $currdate)) . "\" ";
-    $td .= "> " . text(date('d', $currdate)) . "</td>\n";
-    echo $td;
-
-    // end of week row
-    if (date('w', $currdate) == $DOWlist[6]) echo "</tr>\n";
-}
-[-/php-]
-</tbody>
-</table>
-</div>
-</div>
-<div id="bigCalHeader">
-</div>
-
-<div id="providerPicker">
-[-php-] echo xlt('Clinicians'); [-/php-]
-<div>
-[-php-]
-// ==============================
-// FACILITY FILTERING (lemonsoftware)
-// $facilities = getFacilities();
-if (!empty($_SESSION['authorizeduser']) && ($_SESSION['authorizeduser'] == 1)) {
-  $facilities = getFacilities();
-} else {
-  $facilities = getUserFacilities($_SESSION['authUserID']); // from users_facility
-  if (count($facilities) == 1)
-    OpenEMR\Common\Session\SessionUtil::setSession('pc_facility', key($facilities));
-}
-if (count($facilities) > 1) {
-    echo "   <select name='pc_facility' id='pc_facility'  class='view1 form-control'>\n";
-    if ( !$_SESSION['pc_facility'] ) $selected = "selected='selected'";
-    // echo "    <option class='bg-info' value='0' $selected>"  . xlt('All Facilities'). "</option>\n";
-    if (!$GLOBALS['restrict_user_facility']) echo "    <option class='bg-info' value='0' $selected>" . xlt('All Facilities') . "</option>\n";
-
-    foreach ($facilities as $fa) {
-        $selected = ( $_SESSION['pc_facility'] == $fa['id']) ? "selected='selected'" : "" ;
-        echo "    <option class='bg-info' value='" . attr($fa['id']). "' $selected>"  . text($fa['name']). "</option>\n";
-    }
-    echo "   </select>\n";
-}
-// EOS FF
-// ==============================
- echo "</div>";
- echo "   <select multiple size='5' name='pc_username[]' id='pc_username' class='view2 form-control'>\n";
- echo "    <option value='__PC_ALL__'>" . xlt("All Users") . "</option>\n";
- foreach ($provinfo as $doc) {
-  $username = $doc['username'];
-  echo "    <option value='" . attr($username) . "'";
-  foreach ($providers as $provider)
-   if ($provider['username'] == $username) echo " selected";
-  echo ">" . text($doc['lname']) . ", " . text($doc['fname']) . "</option>\n";
- }
- echo "   </select>\n";
-
-[-/php-]
-</div>
-[-php-]
-if($_SESSION['pc_facility'] == 0){
-[-/php-]
-<ul class="list-group list-group-flush" id="facilityColor">
-[-php-]
-foreach ($facilities as $f){
-    echo "<li class='list-group-item' style='border-left: 35px solid ".$f['color'].";'>" . text($f['name'])."</li>";
-}
-[-/php-]
-</ul>
-[-php-]
-}
-[-/php-]
-[-assign var="dayname" value=$DATE|date_format:"%w"-]
-[-assign var="day"     value=$DATE|date_format:"%d"|string_format:"%1d"-]
-[-assign var="month"   value=$DATE|date_format:"%m"|string_format:"%1d"-]
-[-assign var="year"    value=$DATE|date_format:"%Y"|string_format:"%4d"-]
-
-<div id="popup" class="pop-up">
-    <img id="popupImage" alt="" />
-</div>
-</div><!-- end bottomLeft -->
-</div>
-
-<div class="page-content-wrapper">
-<div class="container-fluid calsearch_body">
 <div id="bigCal">
 [-php-]
 /* used in debugging
@@ -374,11 +206,12 @@ foreach ($A_EVENTS as $date => $events) {
 foreach ($providers as $provider) {
     $providerid = $provider['id'];
 
-    echo "<div class='table-responsive'>";
-    echo "<table class='table'>\n";
+    // POLAR: Removed table-responsive and table classes to allow full width
+    echo "<div style='width: 100%; margin: 0; padding: 0;'>";
+    echo "<table style='width: 100%; border-collapse: collapse;'>\n";
     echo " <tr>\n";
     echo "  <td colspan='7' class='providerheader'>";
-    echo text($provider['fname']) . " " . text($provider['lname']);
+    echo text($provider['lname']) . ", " . text($provider['fname']);
     echo "</td>\n";
     echo " </tr>\n";
 
@@ -478,11 +311,6 @@ foreach ($providers as $provider) {
             }
             // eventViewClass allows the event class to override the template (such as from a dispatched system event).
             $evtClass = $event['eventViewClass'] ?? $evtClass;
-            
-            // Add POLAR STAT blinking class for urgent appointments
-            if (isset($isStatAppointment) && $isStatAppointment) {
-                $evtClass .= ' polar-stat-appointment';
-            }
 
             // now, output the event DIV
 
@@ -522,19 +350,6 @@ foreach ($providers as $provider) {
             else {
                 $displayTime .= (date(":ia", $startDateTime));
             }
-            
-            // Check for POLAR STAT status for blinking FIRST
-            $isStatAppointment = false;
-            if ($event['apptstatus'] == 'STAT') {
-                $isStatAppointment = true;
-                $categoryLabel = " - POLAR STAT";
-            } else {
-                // Add category label for POLAR Healthcare
-                $categoryLabel = "";
-                if ($catname && $catname != "General") {
-                    $categoryLabel = " - " . $catname;
-                }
-            }
 
             if ($comment && $GLOBALS['calendar_appt_style'] < 4) $title .= " " . $comment;
 
@@ -566,7 +381,7 @@ foreach ($providers as $provider) {
                 }
                 else
                     $divTitle .= "\r\n[" . $catname . ' ' . $comment . "]" . $fname . " " . $lname;
-                $content .= create_event_time_anchor($displayTime);
+                $content .= text($displayTime);
                 if ($patientid) {
                     // include patient name and link to their details
                     $link_title = attr($fname) . " " . attr($lname) . " \n";
@@ -592,10 +407,6 @@ foreach ($providers as $provider) {
                             }
                             $content .= ")";
                         }
-                    }
-                    // Add category label for POLAR Healthcare
-                    if (isset($categoryLabel)) {
-                        $content .= $categoryLabel;
                     }
                     if ($catid == 1) $content .= "</s>";
                     $content .= "</a>";
@@ -641,38 +452,29 @@ foreach ($providers as $provider) {
             if ( $catid != 6){
                      $divTitle .= "\n(" . xl('double click to edit') . ")";
                 }
-            // Don't apply inline background styles for POLAR STAT appointments
-            $styleAttr = "";
-            if (!(isset($isStatAppointment) && $isStatAppointment)) {
-                if($_SESSION['pc_facility'] == 0){
-                    $styleAttr = " style='background-color:" . $color . "'";
-                }
-                elseif($_SESSION['pc_facility'] == $row['id']){
-                    $styleAttr = " style='background-color:" . $event["catcolor"] . "'";
-                }
-                else{
-                    $styleAttr = " style='background-color: var(--gray300)'";
-                }
-            } else {
-                // Ensure STAT appointments have red background and blinking
-                $styleAttr = " style='background-color: #ff0000 !important; animation: polarStatBlink 1.5s infinite !important;'";
+            
+            // POLAR Healthcare: Check for POLAR STAT status for urgent appointments
+            $isStatAppointment = false;
+            if (isset($event['apptstatus']) && $event['apptstatus'] == 'STAT') {
+                $isStatAppointment = true;
+                $evtClass .= ' polar-stat-appointment'; // Add STAT class for red blinking
             }
             
             if($_SESSION['pc_facility'] == 0){
-                    echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " month_event'" . $styleAttr . " title='" . attr($divTitle) . "'" . " id='" . attr($eventdate) . "-" . attr($eventid) . "-" . attr($pccattype) . "'" . ">";
+                    echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " month_event' style='background-color:" . $color. "' title='" . attr($divTitle) . "'" . " id='" . attr($eventdate) . "-" . attr($eventid) . "-" . attr($pccattype) . "'" . ">";
                     echo $content;
                     echo "</div>\n";
             }
             elseif($_SESSION['pc_facility'] == $row['id']){
-                    echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " month_event'" . $styleAttr .
-                        " title='" . attr($divTitle) . "'".
+                    echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " month_event' style='background-color:".$event["catcolor"].
+                        "' title='" . attr($divTitle) . "'".
                         " id='" . attr($eventdate) . "-" . attr($eventid) . "-" . attr($pccattype) . "'".
                         ">";
                     echo $content;
                     echo "</div>\n";
             }
             else{
-                    echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " month_event'" . $styleAttr . " title='" . attr($divTitle) . "'" . " id='" . attr($eventdate) . "-" . attr($eventid) . "-" . attr($pccattype) . "'>";
+                    echo "<div data-eid='" . attr($eventid) . "' class='" . attr($evtClass) . " month_event' style='background-color: var(--gray300)' title='" . attr($divTitle) . "'" . " id='" . attr($eventdate) . "-" . attr($eventid) . "-" . attr($pccattype) . "'>";
                     echo "<span class='text-center text-danger'>" . text($displayTime) . " " . text($row['name'])."</span>";
                     echo "</div>\n";
             }
@@ -690,10 +492,7 @@ foreach ($providers as $provider) {
 
 [-/php-]
 </div>  <!-- end bigCal DIV -->
-</div>  <!-- end bottom DIV -->
-</div>
 </form>
-</div>
 
 <script>
 
@@ -710,7 +509,9 @@ foreach ($providers as $provider) {
         $("#weekview").click(function() {
           ChangeView(this);
         });
-        //$("#monthview").click(function() { ChangeView(this); });
+        $("#monthview").click(function() {
+          ChangeView(this);
+        });
         //$("#yearview").click(function() { ChangeView(this); });
         $(".tdDatePicker").click(function() {
           ChangeDate(this);

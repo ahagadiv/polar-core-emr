@@ -34,8 +34,8 @@
                         </div>
                         <div class="col-md-4">
                             <select class="form-control" name="pc_keywords_andor" id="pc_keywords_andor" disabled>
-                                <option value="AND" [-php-] echo ($_POST['pc_keywords_andor'] == 'AND' || empty($_POST['pc_keywords_andor'])) ? 'selected' : ''; [-/php-]>[-xlt t='AND'-]</option>
-                                <option value="OR" [-php-] echo ($_POST['pc_keywords_andor'] == 'OR') ? 'selected' : ''; [-/php-]>[-xlt t='OR'-]</option>
+                                <option value="AND" [-php-] echo (isset($_POST['pc_keywords_andor']) && $_POST['pc_keywords_andor'] == 'AND') || empty($_POST['pc_keywords_andor']) ? 'selected' : ''; [-/php-]>[-xlt t='AND'-]</option>
+                                <option value="OR" [-php-] echo (isset($_POST['pc_keywords_andor']) && $_POST['pc_keywords_andor'] == 'OR') ? 'selected' : ''; [-/php-]>[-xlt t='OR'-]</option>
                             </select>
                         </div>
                     </div>
@@ -106,6 +106,7 @@
                             <th>[-xlt t='Provider'-]</th>
                             <th>[-xlt t='Category'-]</th>
                             <th>[-xlt t='Patient'-]</th>
+                            <th>[-xlt t='Status'-]</th>
                         </tr>
                     </table>
                 </div>
@@ -117,6 +118,75 @@
                     * in the original search. I mean, there's no clean separation between the code
                     * and HTML so we may as well just go full-bore PHP here -- JRM March 2008
                     */
+
+                    // POLAR Healthcare: Helper functions for status display - MUST be defined first
+                    if (!function_exists('getStatusBadgeClass')) {
+                        function getStatusBadgeClass($status) {
+                            switch ($status) {
+                                case 'STAT':
+                                    return 'danger'; // Red for STAT/urgent
+                                case 'V':
+                                case 'D':
+                                    return 'success'; // Green for completed
+                                case 'CX':
+                                case 'NS':
+                                    return 'secondary'; // Gray for cancelled/no-show
+                                case 'C':
+                                case 'SMS':
+                                case 'CALL':
+                                case 'EMAIL':
+                                    return 'info'; // Blue for confirmed
+                                case 'W':
+                                case 'I':
+                                    return 'warning'; // Yellow for issues
+                                default:
+                                    return 'primary'; // Default blue
+                            }
+                        }
+                    }
+                    
+                    if (!function_exists('getStatusFullText')) {
+                        function getStatusFullText($status) {
+                            switch ($status) {
+                                case 'S':
+                                    return 'Scheduled';
+                                case 'C':
+                                    return 'Confirmed';
+                                case 'STAT':
+                                    return 'POLAR STAT - Urgent';
+                                case 'T':
+                                    return 'Traveling';
+                                case 'A':
+                                    return 'Arrived';
+                                case 'L':
+                                    return 'Late Arrival';
+                                case 'IP':
+                                    return 'In Progress';
+                                case 'V':
+                                    return 'Visit Complete';
+                                case 'F':
+                                    return 'Follow-up Required';
+                                case 'D':
+                                    return 'Documentation Complete';
+                                case 'NS':
+                                    return 'No Show';
+                                case 'CX':
+                                    return 'Cancelled';
+                                case 'W':
+                                    return 'Weather Delay';
+                                case 'I':
+                                    return 'Insurance Issue';
+                                case 'SMS':
+                                    return 'Text Confirmed';
+                                case 'CALL':
+                                    return 'Phone Confirmed';
+                                case 'EMAIL':
+                                    return 'Email Confirmed';
+                                default:
+                                    return $status; // Return as-is if not recognized
+                            }
+                        }
+                    }
 
                     $eventCount = 0;
                     foreach ($this->get_template_vars('A_EVENTS') as $eDate => $date_events) {
@@ -153,6 +223,17 @@
                             // patient
                             echo "<td>";
                             echo text($event['patient_name']);
+                            echo "</td>";
+                            
+                            // POLAR Healthcare: appointment status with full text
+                            echo "<td>";
+                            $status = $event['apptstatus'] ?? '-';
+                            $statusClass = getStatusBadgeClass($status);
+                            $statusText = getStatusFullText($status);
+                            echo "<span class='badge badge-" . $statusClass . " mr-1'>";
+                            echo text($status);
+                            echo "</span>";
+                            echo "<span class='text-muted'>" . text($statusText) . "</span>";
                             echo "</td>";
                     /*
                             echo "<td>";
@@ -203,14 +284,56 @@ $(function () {
     $("#theform").submit(function() { SubmitForm(this); });
     $(".calsearch_event").click(function() { EditEvent(this); });
 
-    $('.datepicker').datetimepicker({
-        [-php-] $datetimepicker_timepicker = false; [-/php-]
-        [-php-] $datetimepicker_showseconds = false; [-/php-]
-        [-php-] $datetimepicker_formatInput = false; [-/php-]
-        [-php-] require($GLOBALS['srcdir'] . '/js/xl/jquery-datetimepicker-2-5-4.js.php'); [-/php-]
-        [-php-] // can add any additional javascript settings to datetimepicker here; need to prepend first setting with a comma [-/php-]
-        ,format: 'm/d/Y'
-    });
+    // POLAR: Robust datepicker initialization with multiple retries
+    function initializeDatePickers() {
+        console.log('POLAR Healthcare: Attempting datepicker initialization...');
+        
+        // Check if jQuery and datetimepicker are available
+        if (typeof $ === 'undefined') {
+            console.log('POLAR Healthcare: jQuery not ready, retrying...');
+            setTimeout(initializeDatePickers, 200);
+            return;
+        }
+        
+        if (!$.fn.datetimepicker) {
+            console.log('POLAR Healthcare: datetimepicker not loaded, retrying...');
+            setTimeout(initializeDatePickers, 200);
+            return;
+        }
+        
+        console.log('POLAR Healthcare: jQuery and datetimepicker ready!');
+        console.log('POLAR Healthcare: Found .datepicker fields:', $('.datepicker').length);
+        console.log('POLAR Healthcare: #start exists:', $('#start').length);
+        console.log('POLAR Healthcare: #end exists:', $('#end').length);
+        
+        // Destroy any existing instances
+        try {
+            $('#start, #end').datetimepicker('destroy');
+        } catch(e) {
+            // Ignore if not initialized
+        }
+        
+        // Initialize with full configuration
+        var datePickerConfig = {
+            [-php-] $datetimepicker_timepicker = false; [-/php-]
+            [-php-] $datetimepicker_showseconds = false; [-/php-]
+            [-php-] $datetimepicker_formatInput = false; [-/php-]
+            [-php-] require($GLOBALS['srcdir'] . '/js/xl/jquery-datetimepicker-2-5-4.js.php'); [-/php-]
+            [-php-] // can add any additional javascript settings to datetimepicker here; need to prepend first setting with a comma [-/php-]
+            ,format: 'm/d/Y'
+        };
+        
+        $('#start').datetimepicker(datePickerConfig);
+        console.log('POLAR Healthcare: ✅ START field initialized');
+        
+        $('#end').datetimepicker(datePickerConfig);
+        console.log('POLAR Healthcare: ✅ END field initialized');
+        
+        console.log('POLAR Healthcare: ✅ Both date pickers ready!');
+    }
+    
+    // Start initialization immediately
+    initializeDatePickers();
 
     // function to check keywords and toggle AND/OR selector
     function toggleAndOrSelector() {

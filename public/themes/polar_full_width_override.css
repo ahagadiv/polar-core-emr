@@ -1,0 +1,121 @@
+/* POLAR Healthcare - Ultimate Full Width Override - Loads LAST to win CSS cascade */
+
+/* CRITICAL: Target the flexbox containers that are constraining width */
+#framesDisplay,
+#framesDisplay > div,
+#framesDisplay > div.frameDisplay,
+.tabControls {
+    width: 100% !important;
+    max-width: none !important;
+    flex-basis: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Force absolutely everything to be full viewport width */
+html,
+html *,
+body,
+body * {
+    box-sizing: border-box !important;
+}
+
+html {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force all major containers */
+#mainBox,
+.mainFrames,
+#framesDisplay,
+.frameDisplay,
+.min-vw-100,
+.navbar,
+.container-fluid,
+.page-content-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Force iframe to fill width */
+iframe {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove any Bootstrap grid constraints */
+.container,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl,
+.container-fluid {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Flexbox row should be full width */
+.d-flex,
+.flex-row {
+    width: 100% !important;
+}
+
+/* Hide the left tab panel that creates a gap */
+.tabsNoHover.w-1 {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force tab controls to be full width */
+.tabControls {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove any flex-basis that might constrain width */
+.tabSpan {
+    flex-basis: auto !important;
+}
+
+/* Ensure the entire tabs div is full width */
+#tabs_div,
+.body_title {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
