@@ -94,7 +94,7 @@
         "steverhoades/oauth2-openid-connect-server": "2.6.1",
         "stripe/stripe-php": "16.6.0",
         "symfony/config": "6.4.24",
-        "symfony/console": "6.4.25",
+        "symfony/console": "6.4.26",
         "symfony/dependency-injection": "6.4.25",
         "symfony/event-dispatcher": "6.4.25",
         "symfony/finder": "6.4.24",
